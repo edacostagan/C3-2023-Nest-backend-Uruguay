@@ -3,6 +3,9 @@ import { Body, Controller, Delete, Get, Param, ParseBoolPipe, ParseIntPipe, Pars
 import { DepositService } from 'src/business/services';
 import { CreateDepositDto } from 'src/business/dtos';
 import { PaginationEntity, DepositEntity } from '../../../data/persistence/entities';
+import { DataRangeModel } from '../../../../dist/business/models/data-range.model';
+import { PaginationDto } from '../../../business/dtos/pagination.dto';
+import { DataRangeDto } from '../../../business/dtos/data-range.dto';
 
 @Controller('deposit')
 export class DepositController {
@@ -31,14 +34,20 @@ export class DepositController {
     // Get historical Data    
     @Get('/:id')
     getDeposit(@Param('id', ParseUUIDPipe) depositId: string,
-        @Query('limit') limit?: number)
+        @Query('limit') limit?: number, 
+        @Query('start') start?: number, 
+        @Query('end') end?: number)
         : DepositEntity[] {
 
-        const page = new PaginationEntity();
+        const range = new DataRangeDto();
+        range.start=start;
+        range.end=end;
+
+        const page = new PaginationDto();
         page.limit = limit;        
         page.offset = 0;
 
-        return this.depositService.getHistory(depositId, page);
+        return this.depositService.getHistory(depositId, page, range);
 
     }
 }
