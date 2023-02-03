@@ -2,7 +2,7 @@ import { AccountModel } from '../../../business/models';
 
 import { v4 as uuid } from 'uuid';
 
-import { CustomerEntity,AccountTypeEntity } from '.';
+import { CustomerEntity,AccountTypeEntity } from './';
 
 export class AccountEntity implements AccountModel{
     id = uuid();

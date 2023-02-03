@@ -38,9 +38,9 @@ export class AccountController {
 
     // show all accounts
     @Get()
-    async getAll(): Promise<AccountEntity[]> {
+    getAll(): AccountEntity[] {
 
-        return await this.accountService.getAllAccounts();
+        return  this.accountService.getAllAccounts();
     }
 
     // get account information

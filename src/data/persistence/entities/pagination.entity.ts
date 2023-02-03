@@ -1,6 +1,6 @@
 import { PaginationModel } from "../../../business/models";
 
-export class PaginationEntity <T> implements PaginationModel <T> {
+export class PaginationEntity implements PaginationModel {
     offset?: number;
     limit?: number;
 }

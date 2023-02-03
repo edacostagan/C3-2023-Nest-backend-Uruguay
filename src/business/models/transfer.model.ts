@@ -4,6 +4,6 @@ export interface TransferModel{
     income: string;
     amount: number;
     reason: string;
-    dateTime: Date;
+    dateTime: number;
     deletedAt?: Date | number;
 }

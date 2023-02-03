@@ -1,10 +1,11 @@
 import { Injectable } from "@nestjs/common/decorators";
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common/exceptions';
 
-import { TransferEntity } from '../entities';
+import { TransferEntity, DataRangeEntity } from '../entities';
 import { BankInternalControl } from './base';
 import { RepositoryMethodsInterface } from "./interfaces";
-import { PaginationModel, DataRangeModel } from '../../../business/models';
+import { PaginationModel } from '../../../business/models';
+
 
 
 @Injectable()
@@ -23,7 +24,7 @@ export class TransferRepository extends BankInternalControl<TransferEntity> impl
             const newTransfer = this.database.push(transfer);
 
             this.manage(newTransfer).subscribe(newTransferCreated => { 
-                console.log(`Notification: New Transfer: ${transfer.id} Done!`) 
+                console.log(`Notification: New Transfer: ${transfer.id} Done! (Timestamp: ${Date.now()})`) 
             });
 
             return this.database.at(-1) ?? transfer; // all good, returns the new entity 
@@ -130,7 +131,7 @@ export class TransferRepository extends BankInternalControl<TransferEntity> impl
      * @param pagination optional pagination to be consider
      * @returns Array of entities  
      */
-    findAll(pagination?: PaginationModel<TransferEntity>): TransferEntity[] {
+    findAll(pagination?: PaginationModel): TransferEntity[] {
 
         try {
 
@@ -207,8 +208,8 @@ export class TransferRepository extends BankInternalControl<TransferEntity> impl
      * @returns array of entities or an exception
      */
     getAllTransfersById(accountId: string,
-        pagination: PaginationModel<TransferEntity> | undefined,
-        dataRange: DataRangeModel | undefined) {
+        pagination?: PaginationModel,
+        dataRange?: DataRangeEntity) {
 
         try { 
 
@@ -220,8 +221,9 @@ export class TransferRepository extends BankInternalControl<TransferEntity> impl
                 throw new NotFoundException();
             }
 
-            if (dataRange && dataRange.start == typeof Date && dataRange.end == typeof Date) { //if there is a range provided
-                searchResult = searchResult.filter(account => account.dateTime >= dataRange.start && account.dateTime <= dataRange.end)
+            if(dataRange){ //if there is a range provided
+
+                searchResult = searchResult.filter( account => account.dateTime >= dataRange.start && account.dateTime <= dataRange.end)
             }
 
             if (pagination) { // if there is a pagination provided
@@ -248,8 +250,8 @@ export class TransferRepository extends BankInternalControl<TransferEntity> impl
      */
     findBy(property: keyof TransferEntity,
         value: string | number | boolean,
-        pagination?: PaginationModel<TransferEntity>,
-        dataRange?: DataRangeModel): TransferEntity[] {
+        pagination?: PaginationModel,
+        dataRange?: DataRangeEntity): TransferEntity[] {
 
         try {
 
@@ -259,8 +261,9 @@ export class TransferRepository extends BankInternalControl<TransferEntity> impl
                 throw new NotFoundException();
             }
 
-            if (dataRange && dataRange.start == typeof Date && dataRange.end == typeof Date) { //if there is a range provided
-                searchResult = searchResult.filter(account => account.dateTime >= dataRange.start && account.dateTime <= dataRange.end)
+            if(dataRange ){ //if there is a range provided
+              
+                searchResult = searchResult.filter( account => account.dateTime >= dataRange.start && account.dateTime <= dataRange.end)
             }
 
             if (pagination) { // if there is a pagination provided

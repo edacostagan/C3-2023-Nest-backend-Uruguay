@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common/decorators';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common/exceptions';
 
-import { DepositEntity } from '../entities';
+import { DepositEntity, DataRangeEntity, PaginationEntity } from '../entities';
 import { BankInternalControl } from './base';
 import { DepositRepositoryInterface } from './interfaces';
-import { DataRangeModel, PaginationModel } from '../../../business/models';
+import { PaginationModel } from '../../../business/models';
+
 
 @Injectable()
 export class DepositRepository extends BankInternalControl<DepositEntity> implements DepositRepositoryInterface {
@@ -21,7 +22,7 @@ export class DepositRepository extends BankInternalControl<DepositEntity> implem
             const newDeposit = this.database.push(deposit);
 
             this.manage(newDeposit).subscribe(newDepositCreated => { 
-                console.log(`Notification: New Deposit: ${deposit.id} Done!`) 
+                console.log(`Notification: New Deposit: ${deposit.id} Done! (Timestamp: ${Date.now()}`) 
             });
 
             return this.database.at(-1) ?? deposit; // all good, returns the new entity 
@@ -129,7 +130,7 @@ export class DepositRepository extends BankInternalControl<DepositEntity> implem
      * @param pagination optional pagination to be consider
      * @returns Array of entities  
      */
-    findAll(pagination?: PaginationModel<DepositEntity>): DepositEntity[] {
+    findAll(pagination?: PaginationModel): DepositEntity[] {
                 
         try{ 
         
@@ -233,8 +234,8 @@ export class DepositRepository extends BankInternalControl<DepositEntity> implem
      */
     findBy(property: keyof DepositEntity, 
         value: string | number | boolean, 
-        pagination?: PaginationModel<DepositEntity>, 
-        dataRange?: DataRangeModel): DepositEntity[] {
+        pagination?: PaginationEntity, 
+        dataRange?: DataRangeEntity): DepositEntity[] {
             
         try{ 
 
@@ -244,7 +245,8 @@ export class DepositRepository extends BankInternalControl<DepositEntity> implem
                 throw new NotFoundException(); 
             }
 
-            if(dataRange && dataRange.start == typeof Date && dataRange.end == typeof Date){ //if there is a range provided
+            if(dataRange ){ //if there is a range provided                
+
                 searchResult = searchResult.filter( account => account.dateTime >= dataRange.start && account.dateTime <= dataRange.end)
             }
         

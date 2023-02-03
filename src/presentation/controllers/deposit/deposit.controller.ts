@@ -1,11 +1,9 @@
 import { Body, Controller, Delete, Get, Param, ParseBoolPipe, ParseIntPipe, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common';
 
-import { DepositService } from 'src/business/services';
-import { CreateDepositDto } from 'src/business/dtos';
-import { PaginationEntity, DepositEntity } from '../../../data/persistence/entities';
-import { DataRangeModel } from '../../../../dist/business/models/data-range.model';
-import { PaginationDto } from '../../../business/dtos/pagination.dto';
-import { DataRangeDto } from '../../../business/dtos/data-range.dto';
+import { DepositService } from '../../../business/services';
+import { CreateDepositDto, PaginationDto, DataRangeDto } from '../../../business/dtos';
+import { DepositEntity } from '../../../data/persistence/entities';
+
 
 @Controller('deposit')
 export class DepositController {
@@ -34,20 +32,65 @@ export class DepositController {
     // Get historical Data    
     @Get('/:id')
     getDeposit(@Param('id', ParseUUIDPipe) depositId: string,
-        @Query('limit') limit?: number, 
-        @Query('start') start?: number, 
+        @Query('limit') limit?: number,
+        @Query('start') start?: number,
         @Query('end') end?: number)
         : DepositEntity[] {
 
         const range = new DataRangeDto();
-        range.start=start;
-        range.end=end;
-
         const page = new PaginationDto();
-        page.limit = limit;        
-        page.offset = 0;
+
+        if (limit) {
+            if (start) {
+                range.start = start;
+                if (end) {
+                    range.end = end;
+                } else {
+                    range.end = Number.MAX_VALUE;
+                }
+            }
+            else {
+                range.start = 0;
+                range.end = Number.MAX_VALUE;
+            }
+
+
+            page.limit = limit;
+            page.offset = 0;
+
+        } else {
+
+            page.limit = Number.MAX_VALUE;
+            page.offset = 0;
+            range.start = 0;
+            range.end = Number.MAX_VALUE;
+        }
 
         return this.depositService.getHistory(depositId, page, range);
 
+    }
+
+    /**
+     * Check if there are start and end for a datarange and assign correct values
+     * @param range dataRangeDto to evaluate
+     * @param start range start     * 
+     * @param end  range end
+     * @returns range evaluated
+     */
+    private checkDataRange(range: DataRangeDto, start: number | undefined, end: number | undefined): DataRangeDto {
+
+        if (start) {
+            range.start = start;
+            if (end) {
+                range.end = end;
+            } else {
+                range.end = Number.MAX_VALUE;
+            }
+        }
+        else {
+            range.start = 0;
+        }
+
+        return range;
     }
 }

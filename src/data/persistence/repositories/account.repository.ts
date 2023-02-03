@@ -5,6 +5,7 @@ import { PaginationModel } from "../../../business/models";
 import { AccountEntity, AccountTypeEntity } from '../entities';
 import { BankInternalControl } from "./base";
 import { AccountRepositoryInterface } from './interfaces';
+import { PaginationEntity } from '../entities/pagination.entity';
 
 
 @Injectable()
@@ -247,11 +248,11 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
      * @param pagination optional pagination to be consider
      * @returns Array of entities  
      */
-    findAll(pagination?: PaginationModel<AccountEntity>): AccountEntity[] {
+    findAll(pagination?: PaginationEntity): AccountEntity[] {
                 
         try{ 
         
-            let result = this.database.filter( entity => typeof entity.deletedAt === 'undefined'); //applies filter for deleted ones
+            let result = this.database.filter( entity => typeof entity.deletedAt === 'undefined'); 
             
             if( result.length <= 0){ // if the result of the search is empty
                 throw new NotFoundException(); 
@@ -261,8 +262,7 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
                 let { offset = 0, limit = 0 } = pagination;
                 result = result.slice(offset, offset + limit);
             }  
-    
-            return result; // all good, return the array 
+            return result; // all good, return the array
 
         } catch (err){// something wrong happened
 
@@ -323,7 +323,7 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
          * @param pagination optional pagination to consider         
          * @returns array of entities or and exception
          */
-    findBy(property: keyof AccountEntity, value: string | number | boolean , pagination?: PaginationModel<AccountEntity>): AccountEntity[] {
+    findBy(property: keyof AccountEntity, value: string | number | boolean , pagination?: PaginationModel): AccountEntity[] {
             
         try{ 
 

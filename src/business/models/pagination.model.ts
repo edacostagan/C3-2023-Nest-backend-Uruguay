@@ -1,4 +1,4 @@
-export interface PaginationModel <T> {
+export interface PaginationModel {
     offset?: number;
     limit?: number;
 }

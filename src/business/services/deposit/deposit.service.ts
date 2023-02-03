@@ -1,10 +1,11 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 import { DepositEntity } from '../../../data/persistence/entities';
-import { DataRangeModel, PaginationModel } from '../../models';
 import { DepositRepository } from '../../../data/persistence/repositories';
 import { CreateDepositDto } from '../../dtos';
 import { AccountService } from '../account';
+import { PaginationEntity } from '../../../data/persistence/entities/pagination.entity';
+import { DataRangeEntity } from '../../../data/persistence/entities/data-range.entity';
 
 @Injectable()
 export class DepositService {
@@ -28,6 +29,7 @@ export class DepositService {
 
       newDeposit.accountId = deposit.accountId;
       newDeposit.amount = deposit.amount;
+      newDeposit.dateTime = Date.now();
 
       const depositDone = this.depositRepository.register(newDeposit);
 
@@ -62,7 +64,7 @@ export class DepositService {
    * @return {*}  {DepositEntity[]}
    * @memberof DepositService
    */
-  getHistory(accountId: string, pagination?: PaginationModel<DepositEntity>, dataRange?: DataRangeModel): DepositEntity[] {
+  getHistory(accountId: string, pagination?: PaginationEntity, dataRange?: DataRangeEntity): DepositEntity[] {
 
     return this.depositRepository.findBy("accountId", accountId, pagination, dataRange);
 

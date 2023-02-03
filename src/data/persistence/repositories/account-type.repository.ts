@@ -94,7 +94,7 @@ export class AccountTypeRepository
      * @param pagination optional pagination to consider
      * @returns Array of entities 
      */
-    findAll(pagination?: PaginationModel<AccountTypeEntity>): AccountTypeEntity[] {
+    findAll(pagination?: PaginationModel): AccountTypeEntity[] {
 
         try{ 
         
@@ -163,7 +163,7 @@ export class AccountTypeRepository
          * @param pagination optional pagination to consider         
          * @returns array of entities or and exception
          */
-    findBy(property: keyof AccountTypeEntity, value: string | number | boolean, pagination?: PaginationModel<AccountTypeEntity>): AccountTypeEntity[] {
+    findBy(property: keyof AccountTypeEntity, value: string | number | boolean, pagination?: PaginationModel): AccountTypeEntity[] {
             
         try{ 
 

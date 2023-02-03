@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 import { DataRangeModel, PaginationModel } from '../../models';
-import { TransferEntity } from '../../../data/persistence/entities';
+import { TransferEntity, DataRangeEntity, PaginationEntity } from '../../../data/persistence/entities';
 import { TransferRepository } from '../../../data/persistence/repositories';
 import { CreateTransferDto } from '../../dtos';
 import { AccountService } from '../account/';
@@ -34,7 +34,8 @@ export class TransferService {
         newTransfer.income = transfer.income;
         newTransfer.amount = transfer.amount;
         newTransfer.reason = transfer.reason;
-
+        newTransfer.dateTime = Date.now();
+        
         const transferDone = this.transferRepository.register(newTransfer);
 
         if (transferDone) {
@@ -60,8 +61,8 @@ export class TransferService {
    * @memberof TransferService
    */
   getHistoryOut(accountId: string,
-    pagination?: PaginationModel<TransferEntity>,
-    dataRange?: DataRangeModel): TransferEntity[] {
+    pagination?: PaginationEntity,
+    dataRange?: DataRangeEntity): TransferEntity[] {
 
     return this.transferRepository.findBy("outcome", accountId, pagination, dataRange);
 
@@ -77,8 +78,8 @@ export class TransferService {
    * @memberof TransferService
    */
   getHistoryIn(accountId: string,
-    paginator?: PaginationModel<TransferEntity>,
-    dataRange?: DataRangeModel): TransferEntity[] {
+    paginator?: PaginationEntity,
+    dataRange?: DataRangeEntity): TransferEntity[] {
 
     return this.transferRepository.findBy("income", accountId, paginator, dataRange);
   }
@@ -93,12 +94,10 @@ export class TransferService {
    * @memberof TransferService
    */
   getHistory(accountId: string,
-    pagination?: PaginationModel<TransferEntity>,
-    dataRange?: DataRangeModel): TransferEntity[] {    
+    pagination?: PaginationEntity,
+    dataRange?: DataRangeEntity): TransferEntity[] {        
 
-    let history = this.transferRepository.getAllTransfersById(accountId, pagination, dataRange);    
-
-    return history;
+    return this.transferRepository.getAllTransfersById(accountId, pagination, dataRange); ;
   }
     
 
