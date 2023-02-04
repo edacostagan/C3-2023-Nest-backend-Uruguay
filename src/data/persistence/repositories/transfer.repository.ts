@@ -117,7 +117,7 @@ export class TransferRepository extends BankInternalControl<TransferEntity> impl
 
         try {
 
-            this.database[index] = { ...this.database[index], deletedAt: new Date() };
+            this.database[index] = { ...this.database[index], deletedAt: Date.now()};
 
         } catch (err) { // something went wrong
 

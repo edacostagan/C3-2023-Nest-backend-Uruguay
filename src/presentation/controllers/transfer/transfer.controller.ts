@@ -27,18 +27,18 @@ export class TransferController {
         @Query('end') end?: number)
         : TransferEntity[] {
 
-        let range = new DataRangeDto();
-        let page = new PaginationDto();
+        const range = new DataRangeDto();
+        if (start) { range.start = start; }
+        else { range.start = 0; }
 
-        if (limit) {
+        if (end) { range.end = end; }
+        else { range.end = Number.MAX_VALUE; }
 
-            page.limit = limit;
-            page.offset = 0;
+        const page = new PaginationDto();
+        page.offset = 0;
 
-            let range = new DataRangeDto();
-            range = this.checkDataRange(range, start, end);
-
-        }
+        if (limit) { page.limit = limit; }
+        else { page.limit = Number.MAX_VALUE; }
 
         return this.transferService.getHistoryOut(accountId, page, range);
     }
@@ -53,28 +53,19 @@ export class TransferController {
         @Query('end') end?: number)
         : TransferEntity[] {
 
-        let range = new DataRangeDto();
-        let page = new PaginationDto();
+        const range = new DataRangeDto();
+        if (start) { range.start = start; }
+        else { range.start = 0; }
 
-        if (limit) {
+        if (end) { range.end = end; }
+        else { range.end = Number.MAX_VALUE; }
 
-            page.limit = limit;
-            page.offset = 0;
+        const page = new PaginationDto();
+        page.offset = 0;
 
-            let range = new DataRangeDto();
-            range = this.checkDataRange(range, start, end);
+        if (limit) { page.limit = limit; }
+        else { page.limit = Number.MAX_VALUE; }
 
-        }
-        /* 
-                let range = new DataRangeDto();
-                range = this.checkDataRange(range, start, end);
-        
-                const page = new PaginationDto();
-                if (limit) {
-                    page.limit = limit;
-                    page.offset = 0;
-                }
-         */
         return this.transferService.getHistoryIn(accountId, page, range);
     }
 
@@ -88,46 +79,21 @@ export class TransferController {
         @Query('end') end?: number)
         : TransferEntity[] {
 
-        let range = new DataRangeDto();
-        let page = new PaginationDto();
+        const range = new DataRangeDto();
+        if (start) { range.start = start; }
+        else { range.start = 0; }
 
-        if (limit) {
+        if (end) { range.end = end; }
+        else { range.end = Number.MAX_VALUE; }
 
-            page.limit = limit;
-            page.offset = 0;
+        const page = new PaginationDto();
+        page.offset = 0;
 
-            let range = new DataRangeDto();
-            range = this.checkDataRange(range, start, end);
-
-        }
+        if (limit) { page.limit = limit; }
+        else { page.limit = Number.MAX_VALUE; }
 
         return this.transferService.getHistory(accountId, page);
     }
-
-    /**
-     * Check if there are start and end for a datarange and assign correct values
-     * @param range dataRangeDto to evaluate
-     * @param start range start     * 
-     * @param end  range end
-     * @returns range evaluated
-     */
-    private checkDataRange(range: DataRangeDto, start: number | undefined, end: number | undefined): DataRangeDto {
-        
-        if (start) {
-            range.start = start;
-            if (end) {
-                range.end = end;
-            } else {
-                range.end = Number.MAX_VALUE;
-            }
-        }
-        else {
-            range.start = 0;
-        }
-
-        return range;
-    }
-
 
     // delete transfer ( Only soft delete from here )
     @Delete('delete/:id')

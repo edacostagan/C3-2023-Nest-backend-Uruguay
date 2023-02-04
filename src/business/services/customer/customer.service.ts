@@ -1,12 +1,12 @@
 import { ConsoleLogger, Injectable } from '@nestjs/common';
 
 import { UpdateCustomerDto } from '../../dtos';
-import { CustomerEntity, DocumentTypeEntity } from '../../../data/persistence/entities';
+import { CustomerEntity, DocumentTypeEntity, PaginationEntity } from '../../../data/persistence/entities';
 import { CustomerRepository, AccountRepository } from '../../../data/persistence/repositories';
 
 @Injectable()
 export class CustomerService {
-  
+
 
   constructor(
     private readonly customerRepository: CustomerRepository,
@@ -54,9 +54,9 @@ export class CustomerService {
    * Returns all the customers in the DB
    * @returns array of entities
    */
-  getAll(): CustomerEntity[]  {
-    
-   return this.customerRepository.findAll(); 
+  getAll(pagination?: PaginationEntity): CustomerEntity[] {
+
+    return this.customerRepository.findAll(pagination);
   }
 
   /**
@@ -80,9 +80,9 @@ export class CustomerService {
    */
   private checkCustomerBalance(id: string): number {
 
-    let balance = 0;    
+    let balance = 0;
 
-    let accounts = this.accountRepository.findByCustomer(id);    
+    let accounts = this.accountRepository.findByCustomer(id);
 
     if (accounts.length > 0) {
       accounts.forEach(element => {

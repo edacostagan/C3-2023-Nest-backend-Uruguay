@@ -1,48 +1,55 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, ParseUUIDPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, ParseUUIDPipe, Query } from '@nestjs/common';
 
-import { CustomerService } from 'src/business/services';
-import { CustomerEntity } from 'src/data/persistence/entities';
-import { UpdateCustomerDto } from 'src/business/dtos';
+import { CustomerService } from '../../../business/services';
+import { CustomerEntity } from '../../../data/persistence/entities';
+import { PaginationDto, UpdateCustomerDto } from '../../../business/dtos';
 
 @Controller('customer')
 export class CustomerController {
 
-    constructor( private customerService: CustomerService) {}
+    constructor(private customerService: CustomerService) { }
 
     //TODO: Implment checks and controls - Verify user token
-   
+
 
     //update account    
     @Put('update/:id')
-    async updateAccount(@Param('id') customerId: string, 
-                        @Body() newDetails: UpdateCustomerDto): 
-                        Promise<CustomerEntity>{
-    
+    async updateAccount(@Param('id') customerId: string,
+        @Body() newDetails: UpdateCustomerDto):
+        Promise<CustomerEntity> {
+
         return await this.customerService.updatedCustomer(customerId, newDetails);
-    }    
+    }
 
     // Get list of customers
     @Get()
-    async getCustomers() : Promise<CustomerEntity[]>{
-        return await this.customerService.getAll();
+    async getCustomers(@Query('limit') limit?: number): Promise<CustomerEntity[]> {
+
+        const page = new PaginationDto();
+        page.offset = 0;
+
+        if (limit) { page.limit = limit; }
+        else { page.limit = Number.MAX_VALUE; }
+
+        return await this.customerService.getAll(page);
     }
     // get customer information
     @Get('/:id')
-    async getInformation(@Param('id', ParseUUIDPipe) customerId: string): Promise<CustomerEntity>{
-        
-        return await this.customerService.getCustomerInfo(customerId);        
+    async getInformation(@Param('id', ParseUUIDPipe) customerId: string): Promise<CustomerEntity> {
+
+        return await this.customerService.getCustomerInfo(customerId);
     }
 
     // Unsuscribe customer
     @Post('unsubscribe/:id')
-    async unsubscribeCustomer(@Param('id', ParseUUIDPipe) customerId: string): Promise<boolean>{
+    async unsubscribeCustomer(@Param('id', ParseUUIDPipe) customerId: string): Promise<boolean> {
 
         return await this.customerService.unsubscribe(customerId);
     }
 
     // Suscribe customer
     @Post('subscribe/:id')
-    async subscribeCustomer(@Param('id', ParseUUIDPipe) customerId: string): Promise<boolean>{
+    async subscribeCustomer(@Param('id', ParseUUIDPipe) customerId: string): Promise<boolean> {
 
         return await this.customerService.subscribe(customerId);
     }

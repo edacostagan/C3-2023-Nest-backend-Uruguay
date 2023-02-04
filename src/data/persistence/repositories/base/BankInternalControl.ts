@@ -1,4 +1,3 @@
-import { RepositoryMethodsInterface } from "../interfaces";
 import { EventManager } from '../../../../common/patterns/observer/eventManager';
 
 export abstract class BankInternalControl <T> extends EventManager {

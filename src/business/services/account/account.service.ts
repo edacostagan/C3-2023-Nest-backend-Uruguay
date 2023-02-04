@@ -1,13 +1,13 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
-import { AccountEntity, AccountTypeEntity, CustomerEntity } from '../../../data/persistence/entities';
+import { AccountEntity, AccountTypeEntity, CustomerEntity, PaginationEntity } from '../../../data/persistence/entities';
 import { AccountRepository, AccountTypeRepository, CustomerRepository } from '../../../data/persistence/repositories';
 import { CreateAccountDto, UpdateAccountDto, AccountDto } from '../../dtos';
 
 
 @Injectable()
 export class AccountService {
-   
+
 
   constructor(
     private readonly accountRepository: AccountRepository,
@@ -24,14 +24,17 @@ export class AccountService {
 
     const newAccount = new AccountEntity();
 
-    const accountType = new AccountTypeEntity();
+    newAccount.accountTypeId = this.accountTypeRepository.findOneById(account.accountTypeId);
+    newAccount.customerId = this.customerRepository.findOneById(account.customerId);
+
+    /* const accountType = new AccountTypeEntity();
     accountType.id = account.accountTypeId;
     newAccount.accountTypeId = accountType;
 
     const customer = new CustomerEntity();
     customer.id = account.customerId;
     newAccount.customerId = customer;
-    
+     */
     return this.accountRepository.register(newAccount);
   }
 
@@ -43,24 +46,24 @@ export class AccountService {
    */
   updateAccount(accountId: string, newAccountDetails: UpdateAccountDto): AccountEntity {
 
-    const newAccount = new AccountEntity();   
-  
+    const newAccount = new AccountEntity();
+
     const newAccountType = new AccountTypeEntity();
     newAccountType.id = newAccountDetails.accountTypeId;
     newAccount.accountTypeId = newAccountType;
-      
+
     const newCustomer = new CustomerEntity();
     newCustomer.id = newAccountDetails.customerId;
-    newAccount.customerId = newCustomer;    
-    
-    newAccount.balance = newAccountDetails.balance; 
+    newAccount.customerId = newCustomer;
 
-    newAccount.state = newAccountDetails.state;     
+    newAccount.balance = newAccountDetails.balance;
+
+    newAccount.state = newAccountDetails.state;
 
     return this.accountRepository.update(accountId, newAccount);
   }
 
- 
+
   /**
   * Return the information of the account 
   * @param accountId account id to search
@@ -68,7 +71,7 @@ export class AccountService {
   */
   getAccountData(accountId: string): AccountDto {
 
-    let account =  this.accountRepository.findOneById(accountId);
+    let account = this.accountRepository.findOneById(accountId);
 
     let accountData = new AccountDto();
 
@@ -150,8 +153,9 @@ export class AccountService {
    * Return all the accounts in the DB
    * @returns array of entities
    */
-  getAllAccounts(): AccountEntity[] {
-    return this.accountRepository.findAll();
+  getAllAccounts(pagination?: PaginationEntity): AccountEntity[] {
+
+    return this.accountRepository.findAll(pagination);
   }
 
   /**
@@ -218,12 +222,12 @@ export class AccountService {
   deleteAccount(accountId: string, soft?: boolean): void {
 
     //Validate if account has zero balance
-    if(this.getBalance(accountId) === 0){
-      
+    if (this.getBalance(accountId) === 0) {
+
       this.accountRepository.delete(accountId, soft); //TODO: Soft Delete by Default, implement hard/soft selection. 
 
-    }else{
-      
+    } else {
+
       throw new InternalServerErrorException("Account is not Empty!. Delete Canceled");
     }
 

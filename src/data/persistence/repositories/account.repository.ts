@@ -2,10 +2,10 @@ import { Injectable } from "@nestjs/common/decorators";
 import { InternalServerErrorException, NotFoundException } from "@nestjs/common/exceptions";
 
 import { PaginationModel } from "../../../business/models";
-import { AccountEntity, AccountTypeEntity } from '../entities';
+import { AccountEntity, AccountTypeEntity, PaginationEntity } from '../entities';
 import { BankInternalControl } from "./base";
 import { AccountRepositoryInterface } from './interfaces';
-import { PaginationEntity } from '../entities/pagination.entity';
+
 
 
 @Injectable()
@@ -234,7 +234,7 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
 
         try {
 
-            this.database[index] = { ...this.database[index], deletedAt: new Date() };
+            this.database[index] = { ...this.database[index], deletedAt: Date.now() };
 
         } catch (err) { // something went wrong
 

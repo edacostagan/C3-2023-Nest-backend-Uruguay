@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, Param, ParseBoolPipe, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common';
 
-import { AccountEntity } from 'src/data/persistence/entities';
-import { CreateAccountDto, UpdateAccountDto, AccountTransactionDto, AccountDto } from 'src/business/dtos';
-import { AccountService } from 'src/business/services';
+import { AccountEntity } from '../../../data/persistence/entities';
+import { CreateAccountDto, UpdateAccountDto, AccountTransactionDto, AccountDto, PaginationDto } from '../../../business/dtos';
+import { AccountService } from '../../../business/services';
 
 @Controller('account')
 export class AccountController {
@@ -14,7 +14,7 @@ export class AccountController {
     // new account DONE    
     @Post('create')
     createAccount(@Body() account: CreateAccountDto): AccountEntity {
-        
+
         return this.accountService.createAccount(account);;
     }
 
@@ -23,7 +23,7 @@ export class AccountController {
     async updateAccount(@Param('id', ParseUUIDPipe) accountId: string,
         @Body() newDetails: UpdateAccountDto):
         Promise<AccountEntity> {
-            
+
         return this.accountService.updateAccount(accountId, newDetails);
     }
 
@@ -32,15 +32,21 @@ export class AccountController {
     @Delete('delete/:id')
     async deleteAccount(@Param('id', ParseUUIDPipe) accountId: string,
         @Query('soft', ParseBoolPipe) soft?: boolean): Promise<void> {
-        
+
         await this.accountService.deleteAccount(accountId, soft);
     }
 
     // show all accounts
     @Get()
-    getAll(): AccountEntity[] {
+    getAll(@Query('limit') limit?: number): AccountEntity[] {
 
-        return  this.accountService.getAllAccounts();
+        const page = new PaginationDto();
+        page.offset = 0;
+
+        if (limit) { page.limit = limit; }
+        else { page.limit = Number.MAX_VALUE; }
+
+        return this.accountService.getAllAccounts(page);
     }
 
     // get account information

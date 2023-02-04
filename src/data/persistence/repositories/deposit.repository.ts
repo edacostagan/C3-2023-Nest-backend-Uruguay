@@ -115,7 +115,7 @@ export class DepositRepository extends BankInternalControl<DepositEntity> implem
 
         try{
 
-            this.database[index] = {...this.database[index], deletedAt: new Date()};
+            this.database[index] = {...this.database[index], deletedAt: Date.now()};
 
         } catch(err){ // something went wrong
 

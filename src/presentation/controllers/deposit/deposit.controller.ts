@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseBoolPipe, ParseIntPipe, ParseUUIDPipe, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseBoolPipe, ParseUUIDPipe, Post, Query } from '@nestjs/common';
 
 import { DepositService } from '../../../business/services';
 import { CreateDepositDto, PaginationDto, DataRangeDto } from '../../../business/dtos';
@@ -38,59 +38,19 @@ export class DepositController {
         : DepositEntity[] {
 
         const range = new DataRangeDto();
+        if (start) { range.start = start; }
+        else { range.start = 0; }
+
+        if (end) { range.end = end; }
+        else { range.end = Number.MAX_VALUE; }
+
         const page = new PaginationDto();
+        page.offset = 0;           
 
-        if (limit) {
-            if (start) {
-                range.start = start;
-                if (end) {
-                    range.end = end;
-                } else {
-                    range.end = Number.MAX_VALUE;
-                }
-            }
-            else {
-                range.start = 0;
-                range.end = Number.MAX_VALUE;
-            }
-
-
-            page.limit = limit;
-            page.offset = 0;
-
-        } else {
-
-            page.limit = Number.MAX_VALUE;
-            page.offset = 0;
-            range.start = 0;
-            range.end = Number.MAX_VALUE;
-        }
+        if (limit) { page.limit = limit; } 
+        else { page.limit = Number.MAX_VALUE; }
 
         return this.depositService.getHistory(depositId, page, range);
 
-    }
-
-    /**
-     * Check if there are start and end for a datarange and assign correct values
-     * @param range dataRangeDto to evaluate
-     * @param start range start     * 
-     * @param end  range end
-     * @returns range evaluated
-     */
-    private checkDataRange(range: DataRangeDto, start: number | undefined, end: number | undefined): DataRangeDto {
-
-        if (start) {
-            range.start = start;
-            if (end) {
-                range.end = end;
-            } else {
-                range.end = Number.MAX_VALUE;
-            }
-        }
-        else {
-            range.start = 0;
-        }
-
-        return range;
-    }
+    }   
 }
