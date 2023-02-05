@@ -4,8 +4,6 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 //DTOs
 import { SignUpDto, SignInDto, AccountTypeDto, DocumentTypeDto } from 'src/business/dtos';
 import { SecurityService } from 'src/business/services';
-import { showStrategy } from 'src/common/patterns/strategy/strategy';
-import { showFactory } from '../../../common/patterns/factory';
 
 
 import { DocumentTypeEntity, AccountTypeEntity } from '../../../data/persistence/entities';
@@ -66,17 +64,5 @@ export class SecurityController {
     getDocumentType(): DocumentTypeEntity[]{
         return this.documentTypeRepository.findAll()
     }
-
     
-    @Get("factory")
-    getFactory(): void{
-        
-        showFactory();
-    }
-    
-    @Get("strategy")
-    getStrategy(): void{
-        
-        showStrategy();
-    }
 }

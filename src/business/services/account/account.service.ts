@@ -1,8 +1,11 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common/exceptions';
+
 
 import { AccountEntity, AccountTypeEntity, CustomerEntity, PaginationEntity } from '../../../data/persistence/entities';
 import { AccountRepository, AccountTypeRepository, CustomerRepository } from '../../../data/persistence/repositories';
 import { CreateAccountDto, UpdateAccountDto, AccountDto } from '../../dtos';
+import { AccountTypeContext, ChecksAccountStrategy, SavingAccountStrategy } from '../../../common/patterns/strategy/accountType';
 
 
 @Injectable()
@@ -23,18 +26,25 @@ export class AccountService {
   createAccount(account: CreateAccountDto): AccountEntity {
 
     const newAccount = new AccountEntity();
-
-    newAccount.accountTypeId = this.accountTypeRepository.findOneById(account.accountTypeId);
     newAccount.customerId = this.customerRepository.findOneById(account.customerId);
+    
 
-    /* const accountType = new AccountTypeEntity();
-    accountType.id = account.accountTypeId;
-    newAccount.accountTypeId = accountType;
+    if(account.accountTypeName === "Saving"){
+      const savingAccountType = new SavingAccountStrategy();
+      const accountTypeContext =  new AccountTypeContext(savingAccountType);
 
-    const customer = new CustomerEntity();
-    customer.id = account.customerId;
-    newAccount.customerId = customer;
-     */
+      newAccount.accountTypeId = accountTypeContext.assignAccountTypeStrategy();
+    }
+    else if(account.accountTypeName === "Checks"){
+      const checksAccountType = new ChecksAccountStrategy();
+      const accountTypeContext =  new AccountTypeContext(checksAccountType);
+
+      newAccount.accountTypeId = accountTypeContext.assignAccountTypeStrategy();
+    }
+    else{ //evaluate if is possible to create a new account type 
+      throw new NotFoundException("The Account type is not valid")
+    }
+   
     return this.accountRepository.register(newAccount);
   }
 
@@ -69,22 +79,11 @@ export class AccountService {
   * @param accountId account id to search
   * @returns account data or an exception
   */
-  getAccountData(accountId: string): AccountDto {
+  getAccountData(accountId: string): AccountEntity {
 
-    let account = this.accountRepository.findOneById(accountId);
+    let account = this.accountRepository.findOneById(accountId);    
 
-    let accountData = new AccountDto();
-
-    accountData.accountId = account.id;
-    accountData.accountTypeId = account.accountTypeId.id;
-    accountData.accountTypeName = this.accountTypeRepository.findOneById(account.accountTypeId.id).name;
-    accountData.customerId = account.customerId.id;
-    accountData.customerName = this.customerRepository.findOneById(account.customerId.id).fullname;  //account.customerId.fullname;
-    accountData.balance = account.balance;
-    accountData.state = account.state;
-    accountData.deletedAt = account.deletedAt;
-
-    return accountData;
+    return account;
   }
 
   /**

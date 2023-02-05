@@ -289,7 +289,7 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
 
         } catch (err) { // something wrong happened
 
-            throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
+            throw new InternalServerErrorException(`aca Internal Error! (${err})`) // throws an internal Error
         }
     }
 
@@ -312,7 +312,7 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
 
         }catch(err){ // something wrong happened
 
-            throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
+            throw new InternalServerErrorException(` find index - Internal Error! (${err})`) // throws an internal Error
         }
     }
     

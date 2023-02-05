@@ -1,1 +1,2 @@
-export * from './factorypattern.factory';
+export * from './accountType';
+export * from './documentType';

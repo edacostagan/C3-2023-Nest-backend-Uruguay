@@ -1,1 +1,2 @@
-export * from './strategy';
+export * from './accountType';
+export * from './documentType';

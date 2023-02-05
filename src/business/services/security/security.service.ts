@@ -1,5 +1,5 @@
 // Libraries
-import { Injectable, UnauthorizedException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, InternalServerErrorException, NotAcceptableException } from '@nestjs/common';
 
 import { JwtService } from '@nestjs/jwt';
 
@@ -10,13 +10,14 @@ import { SignInDto, SignUpDto, CreateAccountDto } from '../../dtos';
 // Models
 
 // Repositories
-import { CustomerRepository, DocumentTypeRepository, AccountTypeRepository} from '../../../data/persistence/repositories';
+import { CustomerRepository } from '../../../data/persistence/repositories';
 
 // Services
 import { AccountService } from '../account';
 
 // Entities
 import { CustomerEntity } from '../../../data/persistence/entities';
+import { DocumentTypeContext, IdCardStrategy, PassportStrategy } from '../../../common/patterns/strategy/documentType/document-type.strategy';
 
 
 
@@ -24,9 +25,7 @@ import { CustomerEntity } from '../../../data/persistence/entities';
 export class SecurityService {
 
   constructor(
-    private readonly customerRepository: CustomerRepository,
-    private readonly documentTypeRepository: DocumentTypeRepository,
-    private readonly accountTypeRepository: AccountTypeRepository,
+    private readonly customerRepository: CustomerRepository,   
     private readonly accountService: AccountService,
     private jwtService: JwtService
   ) { }
@@ -59,54 +58,54 @@ export class SecurityService {
    */
   signUp(user: SignUpDto): string {
 
-    const documentType = this.documentTypeRepository.findOneById(user.documentTypeId);
+    const newCustomer = new CustomerEntity();
 
-    if (documentType) {
-      const newCustomer = new CustomerEntity();
+    if(user.documentType != 'ID Card' && user.documentType != 'Passport ID') throw new NotAcceptableException("The Document Type is not acceptable!");
 
-      newCustomer.documentType = documentType;
-      newCustomer.document = user.document;
-      newCustomer.fullname = user.fullname;
-      newCustomer.email = user.email;
-      newCustomer.phone = user.phone;
-      newCustomer.password = user.password;
+    if(user.documentType === 'ID Card') {
+      const strategy = new IdCardStrategy();
+      const context = new DocumentTypeContext(strategy);
+      newCustomer.documentType = context.assignDocumentTypeStrategy();
+    }
 
-      const customer = this.customerRepository.register(newCustomer);
+    if(user.documentType === 'Passport ID') {
+      const strategy = new PassportStrategy();
+      const context = new DocumentTypeContext(strategy);
+      newCustomer.documentType = context.assignDocumentTypeStrategy();
+    }
+    
+    newCustomer.document = user.document;
+    newCustomer.fullname = user.fullname;
+    newCustomer.email = user.email;
+    newCustomer.phone = user.phone;
+    newCustomer.password = user.password;
 
-      if (customer) {
+    const customer = this.customerRepository.register(newCustomer);
 
-        const accountType = this.accountTypeRepository.findOneById(user.accountTypeId);
-        if (accountType) {
-          const newAccount = new CreateAccountDto();
+    if (customer) {
 
-          newAccount.customerId = customer.id;
-          newAccount.accountTypeId = accountType.id;
+      const newAccount = new CreateAccountDto();
 
-          const account = this.accountService.createAccount(newAccount);
+      newAccount.customerId = customer.id;
+      newAccount.accountTypeName = "Saving"; // Assigns a new "saving account" to be created 
 
-          if (account) {
+      const account = this.accountService.createAccount(newAccount);
 
-            //TODO: jwt throw errors, is disable now but needs to be checked
-            return this.jwtService.sign({ id: customer.id });
-            
-          } else{
+      if (account) {
 
-            throw new Error('Error creating Account');  
-          }
-        } else {
-
-          throw new Error('Account Type Not valid!');
-        }
+        //TODO: jwt throw errors, is disable now but needs to be checked
+        return this.jwtService.sign({ id: customer.id });
 
       } else {
 
-        throw new Error("New Customer cannot be created!");
+        throw new Error('Error creating Account');
       }
+
+
     } else {
 
-      throw new Error('Document Type not found!');
+      throw new Error("New Customer cannot be created!");
     }
-
   }
 
   /**

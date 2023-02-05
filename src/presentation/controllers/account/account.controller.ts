@@ -51,7 +51,7 @@ export class AccountController {
 
     // get account information
     @Get('/:id')
-    getAccountData(@Param('id', ParseUUIDPipe) accountId: string): AccountDto {
+    getAccountData(@Param('id', ParseUUIDPipe) accountId: string): AccountEntity {
 
         return this.accountService.getAccountData(accountId);
     }
