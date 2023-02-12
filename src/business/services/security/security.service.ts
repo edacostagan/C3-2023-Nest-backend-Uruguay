@@ -18,6 +18,8 @@ import { AccountService } from '../account';
 // Entities
 import { CustomerEntity } from '../../../data/persistence/entities';
 import { DocumentTypeContext, IdCardStrategy, PassportStrategy } from '../../../common/patterns/strategy/documentType/document-type.strategy';
+import { TokenResponseDto as TokenResponseDto } from '../../dtos/security/token-response.dto';
+
 
 
 
@@ -25,7 +27,7 @@ import { DocumentTypeContext, IdCardStrategy, PassportStrategy } from '../../../
 export class SecurityService {
 
   constructor(
-    private readonly customerRepository: CustomerRepository,   
+    private readonly customerRepository: CustomerRepository,
     private readonly accountService: AccountService,
     private jwtService: JwtService
   ) { }
@@ -34,21 +36,24 @@ export class SecurityService {
    * Login to the system -
    *
    * @param {SignInDto} user
-   * @return {*}  {string}
-   * @memberof SecurityService
+   * @return {*}  {status: boolean, token: string}   
    */
-  signIn(user: SignInDto): string {
+  signIn(user: SignInDto): TokenResponseDto {
     const answer = this.customerRepository.findOneByEmailAndPassword(
       user.username,
       user.password,
     );
-    if (answer) {
-      //return 'Here goes JWT (jsonwebtoken gives error right now, is disabled now) -> But Sign In is working '
-      return this.jwtService.sign({ id: user.username, pass: user.password }); //, 'secretToken', { expiresIn: "1h" }); // process.env.SECRET_KEY || 
-    }
 
-    throw new UnauthorizedException();
+    let res: TokenResponseDto = {
+      status: answer[0],
+      token: ""
+    };
 
+    if (answer[0] === true) {
+      res.token = this.jwtService.sign({ id: answer[1] });
+    };
+
+    return res;
   }
 
   /**
@@ -56,24 +61,24 @@ export class SecurityService {
    * @param {SignUpDto} user
    * @return {*}  {string}   
    */
-  signUp(user: SignUpDto): string {
+  signUp(user: SignUpDto): TokenResponseDto {
 
     const newCustomer = new CustomerEntity();
 
-    if(user.documentType != 'ID Card' && user.documentType != 'Passport ID') throw new NotAcceptableException("The Document Type is not acceptable!");
+    if (user.documentType != 'ID Card' && user.documentType != 'Passport ID') throw new NotAcceptableException("The Document Type is not acceptable!");
 
-    if(user.documentType === 'ID Card') {
+    if (user.documentType === 'ID Card') {
       const strategy = new IdCardStrategy();
       const context = new DocumentTypeContext(strategy);
       newCustomer.documentType = context.assignDocumentTypeStrategy();
     }
 
-    if(user.documentType === 'Passport ID') {
+    if (user.documentType === 'Passport ID') {
       const strategy = new PassportStrategy();
       const context = new DocumentTypeContext(strategy);
       newCustomer.documentType = context.assignDocumentTypeStrategy();
     }
-    
+
     newCustomer.document = user.document;
     newCustomer.fullname = user.fullname;
     newCustomer.email = user.email;
@@ -91,15 +96,17 @@ export class SecurityService {
 
       const account = this.accountService.createAccount(newAccount);
 
+      let res: TokenResponseDto = {
+        status: false,
+        token: ""
+      };
+
       if (account) {
-
-        //TODO: jwt throw errors, is disable now but needs to be checked
-        return this.jwtService.sign({ id: customer.id });
-
-      } else {
-
-        throw new Error('Error creating Account');
+        res.status = true;
+        res.token = this.jwtService.sign({ id: customer.id });
       }
+
+      return res;
 
 
     } else {

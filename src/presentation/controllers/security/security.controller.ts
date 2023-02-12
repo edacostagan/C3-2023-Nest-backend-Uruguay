@@ -2,12 +2,14 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 
 //DTOs
-import { SignUpDto, SignInDto, AccountTypeDto, DocumentTypeDto } from 'src/business/dtos';
+import { SignUpDto, SignInDto, AccountTypeDto, DocumentTypeDto, TokenResponseDto } from '../../../business/dtos';
 import { SecurityService } from 'src/business/services';
 
 
 import { DocumentTypeEntity, AccountTypeEntity } from '../../../data/persistence/entities';
 import { DocumentTypeRepository, AccountTypeRepository } from '../../../data/persistence/repositories';
+
+
 
 @Controller('security')
 export class SecurityController {
@@ -19,7 +21,7 @@ export class SecurityController {
 
     //sign in    
     @Post('/signin')
-    async signIn(@Body() user: SignInDto): Promise<string> {
+    signIn(@Body() user: SignInDto): object {
         
         return this.securityService.signIn(user);
     }
@@ -27,8 +29,8 @@ export class SecurityController {
 
     //sign up - new customer    
     @Post('/signup')
-    async signUp(@Body() customer: SignUpDto): Promise<string> {
-        return await this.securityService.signUp(customer);
+    signUp(@Body() customer: SignUpDto) : TokenResponseDto {
+        return this.securityService.signUp(customer);
     }
 
 

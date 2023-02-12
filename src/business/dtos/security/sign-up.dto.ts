@@ -4,8 +4,8 @@ export class SignUpDto{
     
     @IsNotEmpty({message:'DocumentType - This value cannot be empty!'})
     documentType: string;
-                     
-    @IsNumberString()
+                    
+    
     @IsNotEmpty({message:'Document Number - This value cannot be empty!'})
     document: string;
 
@@ -17,11 +17,8 @@ export class SignUpDto{
     @IsNotEmpty({message:'Email - This value cannot be empty!'})
     email: string;
 
-    @IsNumberString()
-    @IsNotEmpty({message:'Phone - This value cannot be empty!'})
     phone: string;
-
-    @IsAlphanumeric()
+    
     @IsNotEmpty({message:'Password - This value cannot be empty!'})       
     password: string;
         
