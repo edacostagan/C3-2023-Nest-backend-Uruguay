@@ -1,15 +1,19 @@
 import { Injectable } from "@nestjs/common/decorators";
 import { InternalServerErrorException, NotFoundException } from "@nestjs/common/exceptions";
+import { PaginationDto } from "src/business";
 
-import { PaginationModel } from "../../../business/models";
+import { PaginationModel, AccountModel } from "../../../business/models";
 import { AccountEntity, AccountTypeEntity, PaginationEntity } from '../entities';
 import { BankInternalControl } from "./base";
 import { AccountRepositoryInterface } from './interfaces';
 
 
 
+
+
 @Injectable()
 export class AccountRepository extends BankInternalControl<AccountEntity> implements AccountRepositoryInterface {
+    
     
         
     /**
@@ -270,6 +274,38 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
         }
     }
     
+    /**
+     * Gets all the accounts of an Id customer
+     * @param customerId 
+     * @param page 
+     * @returns  array
+     */
+    findAllAccountsOfCustomer(customerId: string, page: PaginationDto): AccountModel[] {
+        
+        try{ 
+        
+            let result = this.database.filter( account => account.customerId.id === customerId 
+                                                && typeof account.deletedAt === 'undefined'); 
+            
+            if( result.length <= 0){ // if the result of the search is empty
+                throw new NotFoundException(); 
+            }
+
+            if (page) { // if there is a pagination provided
+                let { offset = 0, limit = 0 } = page;
+                result = result.slice(offset, offset + limit);
+            }  
+            return result as unknown as AccountModel[]; // all good, return the array
+
+        } catch (err){// something wrong happened
+
+            throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
+        }
+    
+    }
+
+
+
     /**
      * Search in the array for an entity that matches the Id provided
      * @param id unique key identifier 

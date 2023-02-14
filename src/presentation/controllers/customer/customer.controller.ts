@@ -2,7 +2,8 @@ import { Body, Controller, Delete, Get, Param, Post, Put, ParseUUIDPipe, Query }
 
 import { CustomerService } from '../../../business/services';
 import { CustomerEntity } from '../../../data/persistence/entities';
-import { PaginationDto, UpdateCustomerDto } from '../../../business/dtos';
+import { CustomerDto, PaginationDto, UpdateCustomerDto } from '../../../business/dtos';
+
 
 @Controller('customer')
 export class CustomerController {
@@ -23,7 +24,7 @@ export class CustomerController {
 
     // Get list of customers
     @Get()
-    async getCustomers(@Query('limit') limit?: number): Promise<CustomerEntity[]> {
+    async getCustomers(@Query('limit') limit?: number): Promise<CustomerDto[]> {
 
         const page = new PaginationDto();
         page.offset = 0;
@@ -35,9 +36,11 @@ export class CustomerController {
     }
     // get customer information
     @Get('/:id')
-    async getInformation(@Param('id', ParseUUIDPipe) customerId: string): Promise<CustomerEntity> {
+    getInformation(@Param('id', ParseUUIDPipe) customerId: string): CustomerDto {
 
-        return await this.customerService.getCustomerInfo(customerId);
+        console.log("buscando usuarios con id: " +customerId)
+
+        return this.customerService.getCustomerInfo(customerId);
     }
 
     // Unsuscribe customer

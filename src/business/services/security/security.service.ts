@@ -39,6 +39,7 @@ export class SecurityService {
    * @return {*}  {status: boolean, token: string}   
    */
   signIn(user: SignInDto): TokenResponseDto {
+    
     const answer = this.customerRepository.findOneByEmailAndPassword(
       user.username,
       user.password,
@@ -50,7 +51,7 @@ export class SecurityService {
     };
 
     if (answer[0] === true) {
-      res.token = this.jwtService.sign({ id: answer[1] });
+      res.token = this.jwtService.sign({id: answer[1]});
     };
 
     return res;

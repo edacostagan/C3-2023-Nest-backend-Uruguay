@@ -21,6 +21,7 @@ export class CustomerService {
   getCustomerInfo(customerId: string): CustomerEntity {
 
     return this.customerRepository.findOneById(customerId);
+    
   }
 
   /**

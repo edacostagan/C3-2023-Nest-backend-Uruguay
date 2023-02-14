@@ -29,7 +29,7 @@ export class SecurityController {
 
     //sign up - new customer    
     @Post('/signup')
-    signUp(@Body() customer: SignUpDto) : TokenResponseDto {
+    signUp(@Body() customer: SignUpDto) : object {
         return this.securityService.signUp(customer);
     }
 

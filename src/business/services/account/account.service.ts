@@ -4,12 +4,14 @@ import { NotFoundException } from '@nestjs/common/exceptions';
 
 import { AccountEntity, AccountTypeEntity, CustomerEntity, PaginationEntity } from '../../../data/persistence/entities';
 import { AccountRepository, AccountTypeRepository, CustomerRepository } from '../../../data/persistence/repositories';
-import { CreateAccountDto, UpdateAccountDto, AccountDto } from '../../dtos';
+import { CreateAccountDto, UpdateAccountDto, PaginationDto } from '../../dtos';
 import { AccountTypeContext, ChecksAccountStrategy, SavingAccountStrategy } from '../../../common/patterns/strategy/accountType';
+
 
 
 @Injectable()
 export class AccountService {
+  
 
 
   constructor(
@@ -156,6 +158,21 @@ export class AccountService {
 
     return this.accountRepository.findAll(pagination);
   }
+
+  /**
+   * Gets all the accounts of a Customer ID
+   * @param customerId 
+   * @param page 
+   * @returns array
+   */
+  getAllAccountsOfCustomer(customerId: string, page: PaginationDto): AccountModel[] {
+  
+    return this.accountRepository.findAllAccountsOfCustomer(customerId, page);
+
+    
+
+  }
+
 
   /**
    * Get account State - OK   *

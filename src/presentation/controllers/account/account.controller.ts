@@ -3,6 +3,8 @@ import { Body, Controller, Delete, Get, Param, ParseBoolPipe, ParseUUIDPipe, Pos
 import { AccountEntity } from '../../../data/persistence/entities';
 import { CreateAccountDto, UpdateAccountDto, AccountTransactionDto, AccountDto, PaginationDto } from '../../../business/dtos';
 import { AccountService } from '../../../business/services';
+import { AccountDataDto } from '../../../business/dtos/account/accountdata.dto';
+import { AccountModel } from '../../../../dist/business/models/account.model';
 
 @Controller('account')
 export class AccountController {
@@ -48,6 +50,22 @@ export class AccountController {
 
         return this.accountService.getAllAccounts(page);
     }
+
+    
+    // show all accounts
+    @Get('customer/:id')
+    getAllByCustomer(@Param( 'id', ParseUUIDPipe) customerId: string,
+                     @Query('limit') limit?: number): AccountModel[] {
+
+        const page = new PaginationDto();
+        page.offset = 0;
+
+        if (limit) { page.limit = limit; }
+        else { page.limit = Number.MAX_VALUE; }
+
+        return this.accountService.getAllAccountsOfCustomer(customerId, page);
+    }
+
 
     // get account information
     @Get('/:id')
