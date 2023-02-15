@@ -1,18 +1,21 @@
 import { ConsoleLogger, Injectable } from '@nestjs/common';
 
-import { UpdateCustomerDto } from '../../dtos';
+import { TokenResponseDto, UpdateCustomerDto } from '../../dtos';
 import { CustomerEntity, DocumentTypeEntity, PaginationEntity } from '../../../data/persistence/entities';
 import { CustomerRepository, AccountRepository } from '../../../data/persistence/repositories';
 import { CustomerDto } from '../../dtos/customer.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class CustomerService {
-  
+
 
 
   constructor(
     private readonly customerRepository: CustomerRepository,
-    private readonly accountRepository: AccountRepository) { }
+    private readonly accountRepository: AccountRepository,
+    private readonly jwtService: JwtService
+  ) { }
 
   /**
    * Get Customer information - OK   *
@@ -23,7 +26,7 @@ export class CustomerService {
   getCustomerInfo(customerId: string): CustomerEntity {
 
     return this.customerRepository.findOneById(customerId);
-    
+
   }
 
   /**
@@ -107,9 +110,25 @@ export class CustomerService {
 
   }
 
-  findCustomerByEmail(email: string): CustomerDto {
-    
-    return this.customerRepository.findOneByEmail(email);
-}
+  /**
+   * Finds a customer in DB with the email given
+   * @param email email to be found
+   * @returns a response with status and customer data
+   */
+  findCustomerByEmail(email: string): TokenResponseDto {
+
+    const result = this.customerRepository.findOneByEmail(email);
+
+    const answer: TokenResponseDto = {
+      status: result[0],
+      token: "",
+    }
+
+    if (result[0] == true && result[1] != null) {
+      answer.token = this.jwtService.sign({data: result[1]});
+    }
+
+    return answer;
+  }
 
 }

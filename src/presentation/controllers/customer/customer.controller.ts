@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put, ParseUUIDPipe, Query }
 
 import { CustomerService } from '../../../business/services';
 import { CustomerEntity } from '../../../data/persistence/entities';
-import { CustomerDto, PaginationDto, UpdateCustomerDto } from '../../../business/dtos';
+import { CustomerDto, PaginationDto, TokenResponseDto, UpdateCustomerDto } from '../../../business/dtos';
 
 
 @Controller('customer')
@@ -24,7 +24,7 @@ export class CustomerController {
 
     // Get list of customers
     @Get()
-    async getCustomers(@Query('limit') limit?: number): Promise<CustomerDto[]> {
+    getCustomers(@Query('limit') limit?: number): CustomerDto[] {
 
         const page = new PaginationDto();
         page.offset = 0;
@@ -32,7 +32,7 @@ export class CustomerController {
         if (limit) { page.limit = limit; }
         else { page.limit = Number.MAX_VALUE; }
 
-        return await this.customerService.getAll(page);
+        return this.customerService.getAll(page);
     }
     // get customer information
     @Get('/:id')
@@ -58,7 +58,8 @@ export class CustomerController {
     }
 
     @Get('email/:email')
-    findCustomerByEmail(@Param('email') customerEmail: string) : CustomerDto {
-        return this.customerService.findCustomerByEmail(customerEmail);
+    async findCustomerByEmail(@Param('email') customerEmail: string) : Promise<TokenResponseDto> {
+
+        return await this.customerService.findCustomerByEmail(customerEmail);
     }
 }

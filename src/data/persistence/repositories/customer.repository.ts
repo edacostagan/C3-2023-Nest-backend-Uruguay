@@ -7,11 +7,12 @@ import { BankInternalControl } from './base';
 import { CustomerRepositoryInterface } from './interfaces';
 import { PaginationModel } from '../../../business/models';
 import { CustomerDto } from '../../../business/dtos/customer.dto';
+import { TokenResponseDto } from '../../../business/dtos/security/token-response.dto';
 
 @Injectable()
 export class CustomerRepository extends BankInternalControl<CustomerEntity> implements CustomerRepositoryInterface {
 
-
+   
     /**
      * Adds a new Customer entity to the Array of customer
      * @param customer new object to be inserted in the array
@@ -273,22 +274,19 @@ export class CustomerRepository extends BankInternalControl<CustomerEntity> impl
      * @param email value to find
      * @returns an entity that matches the given value
      */
-    findOneByEmail(email: string): CustomerDto {
+    findOneByEmail(email: string): [boolean, CustomerDto | null] {
 
-        try { // try to find an entity with a given email
+        
 
             const index = this.database.findIndex(entity => entity.email === email && typeof entity.deletedAt === 'undefined'); //searchs for the position in the array of the entity with Id
 
             if (index === -1) { // if the result of the search is an -1 (not found)
-                throw new NotFoundException(); // gives and exception
-            }
+                return [ false, null]
+            }  
 
-            return this.database[index];// all good, return the entity 
+            return [true, this.database[index]];// all good, return the entity 
 
-        } catch (err) { // something wrong happened
-
-            throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
-        }
+        
     }
 
     /**
