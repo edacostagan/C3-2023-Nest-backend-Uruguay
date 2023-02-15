@@ -3,8 +3,9 @@ import { Body, Controller, Delete, Get, Param, ParseBoolPipe, ParseUUIDPipe, Pos
 import { AccountEntity } from '../../../data/persistence/entities';
 import { CreateAccountDto, UpdateAccountDto, AccountTransactionDto, AccountDto, PaginationDto } from '../../../business/dtos';
 import { AccountService } from '../../../business/services';
-import { AccountDataDto } from '../../../business/dtos/account/accountdata.dto';
-import { AccountModel } from '../../../../dist/business/models/account.model';
+import { AccountModel } from 'src/business/models/account.model';
+
+
 
 @Controller('account')
 export class AccountController {

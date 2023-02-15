@@ -6,6 +6,7 @@ import { CustomerEntity } from '../entities';
 import { BankInternalControl } from './base';
 import { CustomerRepositoryInterface } from './interfaces';
 import { PaginationModel } from '../../../business/models';
+import { CustomerDto } from '../../../business/dtos/customer.dto';
 
 @Injectable()
 export class CustomerRepository extends BankInternalControl<CustomerEntity> implements CustomerRepositoryInterface {
@@ -272,17 +273,17 @@ export class CustomerRepository extends BankInternalControl<CustomerEntity> impl
      * @param email value to find
      * @returns an entity that matches the given value
      */
-    findOneByEmail(email: string): CustomerEntity {
+    findOneByEmail(email: string): CustomerDto {
 
         try { // try to find an entity with a given email
 
             const index = this.database.findIndex(entity => entity.email === email && typeof entity.deletedAt === 'undefined'); //searchs for the position in the array of the entity with Id
 
-            if (index == -1) { // if the result of the search is an -1 (not found)
+            if (index === -1) { // if the result of the search is an -1 (not found)
                 throw new NotFoundException(); // gives and exception
             }
 
-            return this.database[index]; // all good, return the entity 
+            return this.database[index];// all good, return the entity 
 
         } catch (err) { // something wrong happened
 

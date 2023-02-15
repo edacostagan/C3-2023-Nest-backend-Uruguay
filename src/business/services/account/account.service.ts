@@ -6,6 +6,7 @@ import { AccountEntity, AccountTypeEntity, CustomerEntity, PaginationEntity } fr
 import { AccountRepository, AccountTypeRepository, CustomerRepository } from '../../../data/persistence/repositories';
 import { CreateAccountDto, UpdateAccountDto, PaginationDto } from '../../dtos';
 import { AccountTypeContext, ChecksAccountStrategy, SavingAccountStrategy } from '../../../common/patterns/strategy/accountType';
+import { AccountModel } from 'src/business/models';
 
 
 
@@ -167,9 +168,7 @@ export class AccountService {
    */
   getAllAccountsOfCustomer(customerId: string, page: PaginationDto): AccountModel[] {
   
-    return this.accountRepository.findAllAccountsOfCustomer(customerId, page);
-
-    
+    return this.accountRepository.findAllAccountsOfCustomer(customerId, page);    
 
   }
 

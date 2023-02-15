@@ -57,4 +57,8 @@ export class CustomerController {
         return await this.customerService.subscribe(customerId);
     }
 
+    @Get('email/:email')
+    findCustomerByEmail(@Param('email') customerEmail: string) : CustomerDto {
+        return this.customerService.findCustomerByEmail(customerEmail);
+    }
 }

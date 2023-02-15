@@ -3,9 +3,11 @@ import { ConsoleLogger, Injectable } from '@nestjs/common';
 import { UpdateCustomerDto } from '../../dtos';
 import { CustomerEntity, DocumentTypeEntity, PaginationEntity } from '../../../data/persistence/entities';
 import { CustomerRepository, AccountRepository } from '../../../data/persistence/repositories';
+import { CustomerDto } from '../../dtos/customer.dto';
 
 @Injectable()
 export class CustomerService {
+  
 
 
   constructor(
@@ -104,5 +106,10 @@ export class CustomerService {
     return this.customerRepository.setCustomerState(id, true);
 
   }
+
+  findCustomerByEmail(email: string): CustomerDto {
+    
+    return this.customerRepository.findOneByEmail(email);
+}
 
 }
