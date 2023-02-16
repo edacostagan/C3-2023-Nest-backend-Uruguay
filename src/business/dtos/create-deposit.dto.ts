@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsPositive, IsUUID, Min } from "class-validator";
+import { IsNotEmpty, IsNumber,  IsUUID,  } from "class-validator";
 
 export class CreateDepositDto{
     
@@ -6,10 +6,8 @@ export class CreateDepositDto{
     @IsNotEmpty({message:'This value cannot be empty!'})
     accountId: string;
 
-    @IsNumber()
-    @IsPositive({message:'This value must be bigger than 0!'})
-    @IsNotEmpty({message:'This value cannot be empty!'})
-    @Min(1,{message:'The minimun value is 1!'})
+    @IsNumber()    
+    @IsNotEmpty({message:'This value cannot be empty!'})   
     amount: number;   
     
 }

@@ -3,21 +3,37 @@ import { Body, Controller, Delete, Get, Param, ParseBoolPipe, ParseUUIDPipe, Pos
 import { DepositService } from '../../../business/services';
 import { CreateDepositDto, PaginationDto, DataRangeDto } from '../../../business/dtos';
 import { DepositEntity } from '../../../data/persistence/entities';
+import { TokenResponseDto } from '../../../business/dtos/security/token-response.dto';
+import { JwtService } from '@nestjs/jwt';
 
 
 @Controller('deposit')
 export class DepositController {
 
-    constructor(private depositService: DepositService) { }
+    constructor(
+        private depositService: DepositService,
+        private jwtService: JwtService,
+        ) { }
 
 
     //TODO: verify JWT for the user ( if is allow to make transactions )
 
     // Create new deposit        
     @Post('register')
-    async createDeposit(@Body() deposit: CreateDepositDto): Promise<DepositEntity> {
+    createDeposit(@Body() deposit: CreateDepositDto): TokenResponseDto {
 
-        return await this.depositService.createDeposit(deposit);
+        const answer = this.depositService.createDeposit(deposit);
+
+        let res: TokenResponseDto = {
+            status: answer[0],
+            token: ""
+          };
+      
+          if (answer[0] === true) {
+            res.token = this.jwtService.sign({data: answer[1]});
+          };
+      
+          return res;
     }
 
     // delete Deposit ( Only soft delete from here )

@@ -13,9 +13,9 @@ import { AccountRepositoryInterface } from './interfaces';
 
 @Injectable()
 export class AccountRepository extends BankInternalControl<AccountEntity> implements AccountRepositoryInterface {
-    
-    
-        
+
+
+
     /**
      * Adds a new Account entity to the Array of accounts
      * @param account new object to be inserted in the array
@@ -26,9 +26,9 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
         try { // try to add the entity to the array
 
             const newAccount = this.database.push(account);
-            
-            this.manage(newAccount).subscribe(newAccountCreated => { 
-                console.log(`Notification: New Account: ${account.id} created!`) 
+
+            this.manage(newAccount).subscribe(newAccountCreated => {
+                console.log(`Notification: New Account: ${account.id} created!`)
             });
 
             return this.database.at(-1) ?? account; // all good, returns the new entity 
@@ -72,7 +72,7 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
      */
     setAccountState(accountId: string, state: boolean) {
 
-        try{
+        try {
 
             const targetEntityIndex = this.findIndexById(accountId);
 
@@ -82,7 +82,7 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
 
             this.database[targetEntityIndex].state = state;
 
-        }catch(err){
+        } catch (err) {
 
             throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
         }
@@ -95,7 +95,7 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
      */
     removeAmountToBalance(accountId: string, amount: number) {
 
-        try{
+        try {
 
             const targetEntityIndex = this.findIndexById(accountId);
 
@@ -105,33 +105,31 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
 
             this.database[targetEntityIndex].balance -= amount; // Removes the amount to balance
 
-        }catch(err){
+        } catch (err) {
 
             throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
         }
     }
 
-    
+
     /**
      * Adds the amount to the balance of the account that matches the given ID
      * @param accountId account unique Id
      * @param amount amount to add
      */
     addAmountToBalance(accountId: string, amount: number) {
-        try{
 
-            const targetEntityIndex = this.findIndexById(accountId);
 
-            if (targetEntityIndex == -1) { // if the result of the search is an -1 (not found)
-                throw new NotFoundException(); // gives and exception
-            }
+        const targetEntityIndex = this.findIndexById(accountId);
 
-            this.database[targetEntityIndex].balance += amount; // Adds the amount to balance
-
-        }catch(err){
-
-            throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
+        if (targetEntityIndex == -1) { // if the result of the search is an -1 (not found)
+            throw new NotFoundException(); // gives and exception
         }
+
+        const newBalance = this.database[targetEntityIndex].balance + amount;
+        this.database[targetEntityIndex].balance = newBalance;
+
+
     }
 
     /**
@@ -141,24 +139,24 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
      * @returns account type entity
      */
     setAccountType(accountId: string, accountType: AccountTypeEntity): AccountTypeEntity {
-        try{
+        try {
 
             const targetEntityIndex = this.findIndexById(accountId);
 
             if (targetEntityIndex == -1) { // if the result of the search is an -1 (not found)
                 throw new NotFoundException(); // gives and exception                
-            }           
+            }
 
             this.database[targetEntityIndex].accountTypeId = accountType
 
-            return this.database[targetEntityIndex].accountTypeId; 
+            return this.database[targetEntityIndex].accountTypeId;
 
-        }catch(err){
+        } catch (err) {
 
             throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
         }
     }
-    
+
 
     /**
      * Gets the type of account, returns the ID
@@ -166,7 +164,7 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
      * @returns string with the Id of the account Type
      */
     getAccountType(accountId: string): AccountTypeEntity {
-        try{
+        try {
 
             const targetEntityIndex = this.findIndexById(accountId);
 
@@ -176,7 +174,7 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
 
             return this.database[targetEntityIndex].accountTypeId; // returns the unique key Id of the account Type 
 
-        }catch(err){
+        } catch (err) {
 
             throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
         }
@@ -253,27 +251,27 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
      * @returns Array of entities  
      */
     findAll(pagination?: PaginationEntity): AccountEntity[] {
-                
-        try{ 
-        
-            let result = this.database.filter( entity => typeof entity.deletedAt === 'undefined'); 
-            
-            if( result.length <= 0){ // if the result of the search is empty
-                throw new NotFoundException(); 
+
+        try {
+
+            let result = this.database.filter(entity => typeof entity.deletedAt === 'undefined');
+
+            if (result.length <= 0) { // if the result of the search is empty
+                throw new NotFoundException();
             }
 
             if (pagination) { // if there is a pagination provided
                 let { offset = 0, limit = 0 } = pagination;
                 result = result.slice(offset, offset + limit);
-            }  
+            }
             return result; // all good, return the array
 
-        } catch (err){// something wrong happened
+        } catch (err) {// something wrong happened
 
             throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
         }
     }
-    
+
     /**
      * Gets all the accounts of an Id customer
      * @param customerId 
@@ -281,27 +279,27 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
      * @returns  array
      */
     findAllAccountsOfCustomer(customerId: string, page: PaginationDto): AccountModel[] {
-        
-        try{ 
-        
-            let result = this.database.filter( account => account.customerId.id === customerId 
-                                                && typeof account.deletedAt === 'undefined'); 
-            
-            if( result.length <= 0){ // if the result of the search is empty
-                throw new NotFoundException(); 
+
+        try {
+
+            let result = this.database.filter(account => account.customerId.id === customerId
+                && typeof account.deletedAt === 'undefined');
+
+            if (result.length <= 0) { // if the result of the search is empty
+                throw new NotFoundException();
             }
 
             if (page) { // if there is a pagination provided
                 let { offset = 0, limit = 0 } = page;
                 result = result.slice(offset, offset + limit);
-            }  
+            }
             return result as unknown as AccountModel[]; // all good, return the array
 
-        } catch (err){// something wrong happened
+        } catch (err) {// something wrong happened
 
             throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
         }
-    
+
     }
 
 
@@ -325,7 +323,7 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
 
         } catch (err) { // something wrong happened
 
-            throw new InternalServerErrorException(`aca Internal Error! (${err})`) // throws an internal Error
+            throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
         }
     }
 
@@ -336,22 +334,22 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
      * @returns the index or an exception
      */
     findIndexById(id: string): number {
-            
-        try{ // try to find an element with a given Id
 
-            const index = this.database.findIndex(account => account.id === id 
-                            && typeof account.deletedAt === 'undefined' ) ; 
+        try { // try to find an element with a given Id
 
-            if(index == -1) { throw new NotFoundException(); }
+            const index = this.database.findIndex(account => account.id === id
+                && typeof account.deletedAt === 'undefined');
 
-            return index; 
+            if (index == -1) { throw new NotFoundException(); }
 
-        }catch(err){ // something wrong happened
+            return index;
+
+        } catch (err) { // something wrong happened
 
             throw new InternalServerErrorException(` find index - Internal Error! (${err})`) // throws an internal Error
         }
     }
-    
+
     /**
          * Search in the DB any value provided by the property given
          * @param property property where to find
@@ -359,28 +357,28 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
          * @param pagination optional pagination to consider         
          * @returns array of entities or and exception
          */
-    findBy(property: keyof AccountEntity, value: string | number | boolean , pagination?: PaginationModel): AccountEntity[] {
-            
-        try{ 
+    findBy(property: keyof AccountEntity, value: string | number | boolean, pagination?: PaginationModel): AccountEntity[] {
+
+        try {
 
             let searchResult = this.database.filter(entity => entity[property] === value); //searchs for entities that matches the criteria
-        
-            if( searchResult.length <= 0){ // if the result of the search is empty
+
+            if (searchResult.length <= 0) { // if the result of the search is empty
                 throw new NotFoundException(); // gives and exception
             }
-            
+
             if (pagination) { // if there is a pagination provided
                 let { offset = 0, limit = 0 } = pagination;
                 searchResult = searchResult.slice(offset, offset + limit);
-            }  
+            }
 
             return searchResult; // all good, return the entity 
 
-        }catch(err){ // something wrong happened
+        } catch (err) { // something wrong happened
 
             throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
         }
-    } 
+    }
 
     /**
      * Searchs in the DB all the accounts of on customer
@@ -405,52 +403,52 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
         }
     }
 
-/*     /**
-     * Find in the database all the entities with a given state
-     * @param state value to check
-     * @returns array of elements or an exception
-     */
-/*    findByState(state: boolean): AccountEntity[] {
-
-        try { // try to find all entities with a given state
-
-            const searchResult = this.database.filter(entity => entity.state === state && typeof entity.deletedAt === undefined); //searchs for the position in the array of the entity with Id
-
-            if (searchResult.length <= 0) { // if the result of the search is empty
-                throw new NotFoundException(); // gives and exception
-            }
-
-            return searchResult; // all good, return the entity 
-
-        } catch (err) { // something wrong happened
-
-            throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
-        }
-    }
-
+    /*     /**
+         * Find in the database all the entities with a given state
+         * @param state value to check
+         * @returns array of elements or an exception
+         */
+    /*    findByState(state: boolean): AccountEntity[] {
     
-
-    /**
-     * Searchs in the DB all de account of a type
-     * @param accountTypeId unique key identifier of the account type
-     * @returns array of entities of type or an exception
-     */
-  /*  findByAccountType(accountTypeId: string): AccountEntity[] {
-        try { // try to find all entities of a given Type
-
-            const searchResult = this.database.filter(entity => entity.accountTypeId.id === accountTypeId &&
-                typeof entity.deletedAt === undefined); //searchs for entities that matches the criteria
-
-            if (searchResult.length <= 0) { // if the result of the search is empty
-                throw new NotFoundException(); // gives and exception
+            try { // try to find all entities with a given state
+    
+                const searchResult = this.database.filter(entity => entity.state === state && typeof entity.deletedAt === undefined); //searchs for the position in the array of the entity with Id
+    
+                if (searchResult.length <= 0) { // if the result of the search is empty
+                    throw new NotFoundException(); // gives and exception
+                }
+    
+                return searchResult; // all good, return the entity 
+    
+            } catch (err) { // something wrong happened
+    
+                throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
             }
-            return searchResult; // all good, return the entity 
-
-        } catch (err) { // something wrong happened
-
-            throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
         }
-    }
-*/
+    
+        
+    
+        /**
+         * Searchs in the DB all de account of a type
+         * @param accountTypeId unique key identifier of the account type
+         * @returns array of entities of type or an exception
+         */
+    /*  findByAccountType(accountTypeId: string): AccountEntity[] {
+          try { // try to find all entities of a given Type
+  
+              const searchResult = this.database.filter(entity => entity.accountTypeId.id === accountTypeId &&
+                  typeof entity.deletedAt === undefined); //searchs for entities that matches the criteria
+  
+              if (searchResult.length <= 0) { // if the result of the search is empty
+                  throw new NotFoundException(); // gives and exception
+              }
+              return searchResult; // all good, return the entity 
+  
+          } catch (err) { // something wrong happened
+  
+              throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
+          }
+      }
+  */
 
 }

@@ -1,11 +1,9 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
-import { DepositEntity } from '../../../data/persistence/entities';
+import { DepositEntity, PaginationEntity,DataRangeEntity } from '../../../data/persistence/entities';
 import { DepositRepository } from '../../../data/persistence/repositories';
-import { CreateDepositDto } from '../../dtos';
+import { CreateDepositDto , DepositDto} from '../../dtos';
 import { AccountService } from '../account';
-import { PaginationEntity } from '../../../data/persistence/entities/pagination.entity';
-import { DataRangeEntity } from '../../../data/persistence/entities/data-range.entity';
 
 @Injectable()
 export class DepositService {
@@ -22,13 +20,14 @@ export class DepositService {
    * @return {*}  {DepositEntity}
    * @memberof DepositService
    */
-  createDeposit(deposit: CreateDepositDto): DepositEntity {
+  createDeposit(deposit: CreateDepositDto): [boolean,  DepositDto | null] {
 
     if (this.accountService.getState(deposit.accountId)) {
+      
       const newDeposit = new DepositEntity();
 
       newDeposit.accountId = deposit.accountId;
-      newDeposit.amount = deposit.amount;
+      newDeposit.amount = deposit.amount as number;
       newDeposit.dateTime = Date.now();
 
       const depositDone = this.depositRepository.register(newDeposit);
@@ -36,10 +35,11 @@ export class DepositService {
       if (depositDone) {
 
         this.accountService.addBalance(deposit.accountId, deposit.amount);
-        return depositDone;
+        return [true, depositDone];
       }
+      
     }
-    throw new InternalServerErrorException("Something went Wrong. Null Deposit! ");
+    return [false, null];    //throw new InternalServerErrorException("Something went Wrong. Null Deposit! ");
   }
 
   /**

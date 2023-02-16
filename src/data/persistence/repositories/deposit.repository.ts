@@ -9,7 +9,7 @@ import { PaginationModel } from '../../../business/models';
 
 @Injectable()
 export class DepositRepository extends BankInternalControl<DepositEntity> implements DepositRepositoryInterface {
-    
+
     /**
      * Adds a new Deposit entity to the Array of deposits
      * @param deposit new object to be inserted in the array
@@ -17,23 +17,19 @@ export class DepositRepository extends BankInternalControl<DepositEntity> implem
      */
     register(deposit: DepositEntity): DepositEntity {
 
-        try{ // try to add the entity to the array
-            
-            const newDeposit = this.database.push(deposit);
 
-            this.manage(newDeposit).subscribe(newDepositCreated => { 
-                console.log(`Notification: New Deposit: ${deposit.id} Done! (Timestamp: ${Date.now()}`) 
-            });
 
-            return this.database.at(-1) ?? deposit; // all good, returns the new entity 
+        const newDeposit = this.database.push(deposit);
 
-        } catch (err){ // something went wrong, push didn't work
+        this.manage(newDeposit).subscribe(newDepositCreated => {
+            console.log(`Notification: New Deposit: ${deposit.id} Done! (Timestamp: ${Date.now()}`)
+        });
 
-            throw new InternalServerErrorException(`Internal Error! (${err})`)
+        return this.database.at(-1) ?? deposit; // all good, returns the new entity 
 
-        }
+
     }
-    
+
     /**
      * Modify the data of the Deposit that matches a given Id
      * @param id unique key identifier
@@ -41,50 +37,50 @@ export class DepositRepository extends BankInternalControl<DepositEntity> implem
      */
     update(id: string, entity: DepositEntity): DepositEntity {
 
-        try{                   
+        try {
             const targetEntityIndex = this.findIndexById(id);
 
-            if(targetEntityIndex == -1){ // if the result of the search is an -1 (not found)
+            if (targetEntityIndex == -1) { // if the result of the search is an -1 (not found)
                 throw new NotFoundException(); // gives and exception
             }
 
-            this.database[targetEntityIndex] = {...this.database[targetEntityIndex], ...entity, id: id} as DepositEntity; // update existing entity
+            this.database[targetEntityIndex] = { ...this.database[targetEntityIndex], ...entity, id: id } as DepositEntity; // update existing entity
 
             return this.database[targetEntityIndex]; // all good, returning update existing entity
 
-        } catch (err){// something wrong happened
+        } catch (err) {// something wrong happened
 
             throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
-        }        
+        }
     }
-    
+
     /**
      * Delete the Deposit that matches a given Id
      * @param id unique key identifier
      * @param soft sets the deletion method to use (true = logical / false = permanent)
      */
     delete(id: string, soft?: boolean | undefined): void {
-        
-        try{        
-        
+
+        try {
+
             const targetEntityIndex = this.findIndexById(id);
 
-            if(targetEntityIndex == -1){ // if the result of the search is an -1 (not found)
+            if (targetEntityIndex == -1) { // if the result of the search is an -1 (not found)
                 throw new NotFoundException(); // gives and exception
-            }  
-            
-            if(typeof soft === undefined || soft === true){ // check if is a Logical Deletion
+            }
 
-                    this.softDelete(targetEntityIndex); // calls the internal soft delete method
+            if (typeof soft === undefined || soft === true) { // check if is a Logical Deletion
+
+                this.softDelete(targetEntityIndex); // calls the internal soft delete method
 
             }
-            else if(typeof soft !== undefined || soft === false){ // checks if is Physical Deletion
+            else if (typeof soft !== undefined || soft === false) { // checks if is Physical Deletion
 
                 this.hardDelete(targetEntityIndex); // calls the internal hard delete method
-                
+
             }
 
-        } catch (err){// something wrong happened
+        } catch (err) {// something wrong happened
 
             throw new InternalServerErrorException(`no encontrado Internal Error! (${err})`) // throws an internal Error
 
@@ -97,11 +93,11 @@ export class DepositRepository extends BankInternalControl<DepositEntity> implem
      */
     private hardDelete(index: number): void {
 
-        try{
+        try {
 
             this.database.splice(index);
 
-        } catch(err){ // something went wrong
+        } catch (err) { // something went wrong
 
             throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
         }
@@ -113,17 +109,17 @@ export class DepositRepository extends BankInternalControl<DepositEntity> implem
      */
     private softDelete(index: number): void {
 
-        try{
+        try {
 
-            this.database[index] = {...this.database[index], deletedAt: Date.now()};
+            this.database[index] = { ...this.database[index], deletedAt: Date.now() };
 
-        } catch(err){ // something went wrong
+        } catch (err) { // something went wrong
 
             throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
-        }        
+        }
     }
 
-    
+
     /**
      * Returns the content of the array of Deposits    
      * excludes the mark as deleted
@@ -131,28 +127,28 @@ export class DepositRepository extends BankInternalControl<DepositEntity> implem
      * @returns Array of entities  
      */
     findAll(pagination?: PaginationModel): DepositEntity[] {
-                
-        try{ 
-        
-            let result = this.database.filter( entity => typeof entity.deletedAt === undefined); //applies filter for deleted ones
-            
-            if( result.length <= 0){ // if the result of the search is empty
-                throw new NotFoundException(); 
+
+        try {
+
+            let result = this.database.filter(entity => typeof entity.deletedAt === undefined); //applies filter for deleted ones
+
+            if (result.length <= 0) { // if the result of the search is empty
+                throw new NotFoundException();
             }
 
             if (pagination) { // if there is a pagination provided
                 let { offset = 0, limit = 0 } = pagination;
                 result = result.slice(offset, offset + limit);
-            }  
-    
+            }
+
             return result; // all good, return the array 
 
-        } catch (err){// something wrong happened
+        } catch (err) {// something wrong happened
 
             throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
         }
     }
-    
+
     /**
      * Search in the array for an entity that matches the Id provided
      * @param id unique key identifier 
@@ -160,45 +156,45 @@ export class DepositRepository extends BankInternalControl<DepositEntity> implem
      */
     findOneById(id: string): DepositEntity {
 
-        try{ // try to find an entity with a given Id
+        try { // try to find an entity with a given Id
 
             const index = this.findIndexById(id);
 
-            if(index == -1){ // if the result of the search is an -1 (not found)
+            if (index == -1) { // if the result of the search is an -1 (not found)
                 throw new NotFoundException(); // gives and exception
             }
 
             return this.database[index]; // all good, return the entity 
 
-        }catch(err){ // something wrong happened
+        } catch (err) { // something wrong happened
 
             throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
         }
-    }  
- 
+    }
+
     /**
      * Search in the DB for an element with the given ID 
      * @param id unique key identifier to find
      * @returns the index or an exception
      */
     findIndexById(id: string): number {
-            
-        try{ // try to find an element with a given Id
 
-            const index = this.database.findIndex(deposit => deposit.id === id 
-                            && typeof deposit.deletedAt === 'undefined' ) ; 
+        try { // try to find an element with a given Id
 
-            if(index == -1) { throw new NotFoundException(); }
+            const index = this.database.findIndex(deposit => deposit.id === id
+                && typeof deposit.deletedAt === 'undefined');
 
-            return index; 
+            if (index == -1) { throw new NotFoundException(); }
 
-        }catch(err){ // something wrong happened
+            return index;
+
+        } catch (err) { // something wrong happened
 
             throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
         }
     }
 
-    
+
     /**
      * Searchs in the DB for the Deposits matching an AccountID
      * @param accountId account unique key identifier
@@ -206,18 +202,18 @@ export class DepositRepository extends BankInternalControl<DepositEntity> implem
      */
     findByAccountId(accountId: string): DepositEntity[] {
 
-        try{ // try to find all entities that matches a Account Id
+        try { // try to find all entities that matches a Account Id
 
             const searchResult = this.database.filter(entity => entity.accountId === accountId
-                 && typeof entity.deletedAt === undefined ) ; //searchs for the matches
-           
-            if(searchResult.length <= 0){ // if the result of the search is an -1 (not found)
+                && typeof entity.deletedAt === undefined); //searchs for the matches
+
+            if (searchResult.length <= 0) { // if the result of the search is an -1 (not found)
                 throw new NotFoundException(); // gives and exception
             }
 
             return searchResult; // all good, return the array of entities 
 
-        }catch(err){ // something wrong happened
+        } catch (err) { // something wrong happened
 
             throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
         }
@@ -232,85 +228,85 @@ export class DepositRepository extends BankInternalControl<DepositEntity> implem
      * @param dataRange dataRange to filter for
      * @returns array of entities or and exception
      */
-    findBy(property: keyof DepositEntity, 
-        value: string | number | boolean, 
-        pagination?: PaginationEntity, 
+    findBy(property: keyof DepositEntity,
+        value: string | number | boolean,
+        pagination?: PaginationEntity,
         dataRange?: DataRangeEntity): DepositEntity[] {
-            
-        try{ 
+
+        try {
 
             let searchResult = this.database.filter(entity => entity[property] === value); //searchs for entities that matches the criteria
-            
-            if( searchResult.length <= 0){ // if the result of the search is empty
-                throw new NotFoundException(); 
+
+            if (searchResult.length <= 0) { // if the result of the search is empty
+                throw new NotFoundException();
             }
 
-            if(dataRange ){ //if there is a range provided                
+            if (dataRange) { //if there is a range provided                
 
-                searchResult = searchResult.filter( account => account.dateTime >= dataRange.start && account.dateTime <= dataRange.end)
+                searchResult = searchResult.filter(account => account.dateTime >= dataRange.start && account.dateTime <= dataRange.end)
             }
-        
+
             if (pagination) { // if there is a pagination provided
-            let { offset = 0, limit = 0 } = pagination;
-            searchResult = searchResult.slice(offset, offset + limit);
-            }  
+                let { offset = 0, limit = 0 } = pagination;
+                searchResult = searchResult.slice(offset, offset + limit);
+            }
 
             return searchResult; // all good, return the array 
 
-        }catch(err){ // something wrong happened
+        } catch (err) { // something wrong happened
 
             throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
         }
     }
 
-/*
-    /**
-     * Searchs in the DB for Deposits made between dates
-     * @param dateInit start date 
-     * @param dateEnd  end date
-     * @returns array of entities or and exception
-     */
-/*    findByDataRange(accountId: string, dateInit: Date | number, dateEnd: Date | number): DepositEntity[] {
-        
-        try{ // try to find all entities that matches date range
-
-            const searchResult = this.database.filter(entity => entity.accountId === accountId
-                && entity.dateTime >= dateInit 
-                && entity.dateTime <= dateEnd
-                && typeof entity.deletedAt === undefined ) ; 
-
-            if(searchResult.length <= 0){ // if the result of the search is an -1 (not found)
-                throw new NotFoundException(); // gives and exception
+    /*
+        /**
+         * Searchs in the DB for Deposits made between dates
+         * @param dateInit start date 
+         * @param dateEnd  end date
+         * @returns array of entities or and exception
+         */
+    /*    findByDataRange(accountId: string, dateInit: Date | number, dateEnd: Date | number): DepositEntity[] {
+            
+            try{ // try to find all entities that matches date range
+    
+                const searchResult = this.database.filter(entity => entity.accountId === accountId
+                    && entity.dateTime >= dateInit 
+                    && entity.dateTime <= dateEnd
+                    && typeof entity.deletedAt === undefined ) ; 
+    
+                if(searchResult.length <= 0){ // if the result of the search is an -1 (not found)
+                    throw new NotFoundException(); // gives and exception
+                }
+    
+                return searchResult; // all good, return the array of entities 
+    
+            }catch(err){ // something wrong happened
+    
+                throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
             }
-
-            return searchResult; // all good, return the array of entities 
-
-        }catch(err){ // something wrong happened
-
-            throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
         }
-    }
-
-    /**
-     * Search in the DB any value provided by the property given
-     * @param property property where to find
-     * @param value value to find
-     * @returns array of entities or and exception
-     */
- /*   findBy(property: keyof DepositEntity, value: string | number | boolean): DepositEntity[] {
-                
-        try{ 
-
-            const searchResult = this.database.filter(entity => entity[property] === value); //searchs for entities that matches the criteria
-           
-            if( searchResult.length <= 0){ // if the result of the search is empty
-                throw new NotFoundException(); // gives and exception
-            }
-            return searchResult; // all good, return the entity 
-
-        }catch(err){ // something wrong happened
-
-            throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
-        }
-    }*/
+    
+        /**
+         * Search in the DB any value provided by the property given
+         * @param property property where to find
+         * @param value value to find
+         * @returns array of entities or and exception
+         */
+    /*   findBy(property: keyof DepositEntity, value: string | number | boolean): DepositEntity[] {
+                   
+           try{ 
+   
+               const searchResult = this.database.filter(entity => entity[property] === value); //searchs for entities that matches the criteria
+              
+               if( searchResult.length <= 0){ // if the result of the search is empty
+                   throw new NotFoundException(); // gives and exception
+               }
+               return searchResult; // all good, return the entity 
+   
+           }catch(err){ // something wrong happened
+   
+               throw new InternalServerErrorException(`Internal Error! (${err})`) // throws an internal Error
+           }
+       }*/
 }

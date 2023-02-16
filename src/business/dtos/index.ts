@@ -3,6 +3,7 @@ export * from './create-deposit.dto';
 export * from './create-transfer.dto';
 export * from './customer.dto';
 export * from './data-range.dto';
+export * from './deposit.dto';
 export * from './document-type.dto';
 export * from './pagination.dto';
 export * from './security';
