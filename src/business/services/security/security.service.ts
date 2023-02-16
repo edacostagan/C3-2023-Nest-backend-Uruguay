@@ -51,7 +51,7 @@ export class SecurityService {
     };
 
     if (answer[0] === true) {
-      res.token = this.jwtService.sign({id: answer[1]});
+      res.token = this.jwtService.sign({data: answer[1]});
     };
 
     return res;
@@ -104,7 +104,7 @@ export class SecurityService {
 
       if (account) {
         res.status = true;
-        res.token = this.jwtService.sign({ id: customer.id });
+        res.token = this.jwtService.sign({ data: customer });
       }
 
       return res;

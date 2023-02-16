@@ -18,7 +18,7 @@ export class CustomerRepository extends BankInternalControl<CustomerEntity> impl
      * @param customer new object to be inserted in the array
      * @returns new entity added
      */
-    register(customer: CustomerEntity): CustomerEntity {
+    register(customer: CustomerEntity): CustomerDto {
 
         try { // try to add the entity to the array
 
@@ -232,15 +232,15 @@ export class CustomerRepository extends BankInternalControl<CustomerEntity> impl
      * @param password password to check
      * @returns true or false 
      */
-    findOneByEmailAndPassword(email: string, password: string): [boolean, string] {
+    findOneByEmailAndPassword(email: string, password: string): [boolean, CustomerDto] {
 
         const index = this.database.findIndex(entity => entity.email === email &&
             entity.password === password && typeof entity.deletedAt === 'undefined'
         );
 
-        const accountId = this.database[index].id; //customer ID
+        const customer = this.database[index]; //customer ID
 
-        return [index == -1 ? false : true, accountId]; // if the value returned is -1 the values dont have a match in the DB
+        return [index == -1 ? false : true, customer]; // if the value returned is -1 the values dont have a match in the DB
     }
 
 
@@ -274,19 +274,15 @@ export class CustomerRepository extends BankInternalControl<CustomerEntity> impl
      * @param email value to find
      * @returns an entity that matches the given value
      */
-    findOneByEmail(email: string): [boolean, CustomerDto | null] {
+    findOneByEmail(email: string): [boolean, CustomerDto] {
 
-        
+        const index = this.database.findIndex(entity => entity.email === email &&
+            typeof entity.deletedAt === 'undefined'
+        );
 
-            const index = this.database.findIndex(entity => entity.email === email && typeof entity.deletedAt === 'undefined'); //searchs for the position in the array of the entity with Id
+        const customer = this.database[index]; //customer ID
 
-            if (index === -1) { // if the result of the search is an -1 (not found)
-                return [ false, null]
-            }  
-
-            return [true, this.database[index]];// all good, return the entity 
-
-        
+        return [index == -1 ? false : true, customer]; // if the value returned is -1 the values dont have a match in the DB
     }
 
     /**

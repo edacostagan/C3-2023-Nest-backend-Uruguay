@@ -21,7 +21,7 @@ export class SecurityController {
 
     //sign in    
     @Post('/signin')
-    signIn(@Body() user: SignInDto): object {
+    signIn(@Body() user: SignInDto): TokenResponseDto {
         
         return this.securityService.signIn(user);
     }

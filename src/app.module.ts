@@ -27,7 +27,7 @@ import { AccountRepository,
 @Module({  
   imports: [ConfigModule.forRoot(), 
             JwtModule.register({ secret: 'secretKey',
-                           signOptions: { expiresIn: '5m' },
+                           signOptions: { expiresIn: '1d' },
   })],
   controllers: [AccountController, CustomerController, DepositController, TransferController, SecurityController, ],
   providers: [AccountService, 
