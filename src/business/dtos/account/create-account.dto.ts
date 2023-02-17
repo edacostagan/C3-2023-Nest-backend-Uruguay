@@ -7,7 +7,7 @@ export class CreateAccountDto{
     customerId: string;
     
     @IsNotEmpty({message:'AccountTypeName - This value cannot be empty!'})
-    @IsString()
+    //@IsString()
     accountTypeName: string;
     
     

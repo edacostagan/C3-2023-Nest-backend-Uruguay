@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, ParseUUIDPipe, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, ParseUUIDPipe, Query, Patch } from '@nestjs/common';
 
 import { CustomerService } from '../../../business/services';
 import { CustomerEntity } from '../../../data/persistence/entities';
@@ -15,11 +15,11 @@ export class CustomerController {
 
     //update account    
     @Put('update/:id')
-    async updateAccount(@Param('id') customerId: string,
+     updateAccount(@Param('id') customerId: string,
         @Body() newDetails: UpdateCustomerDto):
-        Promise<CustomerEntity> {
+        CustomerEntity {
 
-        return await this.customerService.updatedCustomer(customerId, newDetails);
+        return this.customerService.updatedCustomer(customerId, newDetails);
     }
 
     // Get list of customers
