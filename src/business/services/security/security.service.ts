@@ -1,5 +1,5 @@
 // Libraries
-import { Injectable, UnauthorizedException, InternalServerErrorException, NotAcceptableException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotAcceptableException } from '@nestjs/common';
 
 import { JwtService } from '@nestjs/jwt';
 

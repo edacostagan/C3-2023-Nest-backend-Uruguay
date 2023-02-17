@@ -126,7 +126,7 @@ export class AccountRepository extends BankInternalControl<AccountEntity> implem
             throw new NotFoundException(); // gives and exception
         }
 
-        const newBalance = this.database[targetEntityIndex].balance + amount;
+        const newBalance = this.database[targetEntityIndex].balance + Number(amount);
         this.database[targetEntityIndex].balance = newBalance;
 
 
