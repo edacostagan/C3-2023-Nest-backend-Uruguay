@@ -15,10 +15,10 @@ export class CustomerController {
 
     //update account    
     @Put('update/:id')
-     updateAccount(@Param('id') customerId: string,
-        @Body() newDetails: UpdateCustomerDto):
+     updateAccount(@Param('id') customerId: string, @Body() newDetails: UpdateCustomerDto):
         CustomerEntity {
 
+            console.log('update 1')
         return this.customerService.updatedCustomer(customerId, newDetails);
     }
 

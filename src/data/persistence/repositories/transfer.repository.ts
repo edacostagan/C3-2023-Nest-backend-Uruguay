@@ -223,7 +223,7 @@ export class TransferRepository extends BankInternalControl<TransferEntity> impl
 
             if(dataRange){ //if there is a range provided
 
-                searchResult = searchResult.filter( account => account.dateTime >= dataRange.start && account.dateTime <= dataRange.end)
+                searchResult = searchResult.filter( account => account.datetime >= dataRange.start && account.datetime <= dataRange.end)
             }
 
             if (pagination) { // if there is a pagination provided
@@ -263,7 +263,7 @@ export class TransferRepository extends BankInternalControl<TransferEntity> impl
 
             if(dataRange ){ //if there is a range provided
               
-                searchResult = searchResult.filter( account => account.dateTime >= dataRange.start && account.dateTime <= dataRange.end)
+                searchResult = searchResult.filter( account => account.datetime >= dataRange.start && account.datetime <= dataRange.end)
             }
 
             if (pagination) { // if there is a pagination provided

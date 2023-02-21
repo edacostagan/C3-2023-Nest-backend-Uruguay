@@ -41,9 +41,9 @@ export class CustomerService {
     let customer = new CustomerEntity();
 
     const documentType = new DocumentTypeEntity();
-    documentType.id = newCustomerDetails.documentTypeId as string;
+    documentType.id = newCustomerDetails.documentTypeId;
     customer.documentType = documentType;
-
+console.log("aca va bien")
     customer = {...customer, ...newCustomerDetails}
 
     /* customer.document = newCustomerDetails.document;
@@ -52,7 +52,7 @@ export class CustomerService {
     customer.password = newCustomerDetails.password;
     customer.phone = newCustomerDetails.phone;
     customer.state = newCustomerDetails.state;
-    customer.avatarUrl = newCustomerDetails.avatarUrl; */
+    customer.avatarUrl = newCustomerDetails.avatarUrl;  */
 
     return this.customerRepository.update(id, customer);
 

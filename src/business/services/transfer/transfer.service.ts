@@ -34,7 +34,7 @@ export class TransferService {
         newTransfer.income = transfer.income;
         newTransfer.amount = transfer.amount;
         newTransfer.reason = transfer.reason;
-        newTransfer.dateTime = Date.now();
+        newTransfer.datetime = Date.now();
         
         const transferDone = this.transferRepository.register(newTransfer);
 

@@ -2,27 +2,27 @@ import { IsAlphanumeric, IsBoolean, IsEmail, IsNotEmpty, IsNumberString, IsStrin
 
 export class UpdateCustomerDto{
 
-   // @IsUUID(4, {message:'The value provided is not a UUID valid!'})    
-    documentTypeId?: string;
+    @IsUUID(4, {message:'The value provided is not a UUID valid!'})    
+    documentTypeId: string;
                      
- //   @IsNumberString()    
-    document?: string;
+    @IsNumberString()    
+    document: string;
     
- //  @IsString()
-    fullname?: string;
+    @IsString()
+    fullname: string;
 
-  //  @IsEmail()    
-    email?: string;
+    @IsEmail()    
+    email: string;
 
-  //  @IsNumberString()    
-    phone?: string;
+    @IsNumberString()    
+    phone: string;
 
-  //  @IsAlphanumeric()      
-    password?: string;
+    @IsAlphanumeric()      
+    password: string;
     
-  //  @IsBoolean({message:'The value provided is not true or false!'})
+    @IsBoolean({message:'The value provided is not true or false!'})
     state?: boolean;
 
- //   @IsUrl()
+    @IsUrl()
     avatarUrl?: string;
 }

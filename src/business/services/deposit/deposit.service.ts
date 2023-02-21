@@ -28,7 +28,7 @@ export class DepositService {
 
       newDeposit.accountId = deposit.accountId;
       newDeposit.amount = deposit.amount as number;
-      newDeposit.dateTime = Date.now();
+      newDeposit.datetime = Date.now();
 
       const depositDone = this.depositRepository.register(newDeposit);
 
